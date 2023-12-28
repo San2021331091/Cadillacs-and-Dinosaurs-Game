@@ -23,7 +23,7 @@ int main() {
 
 
         // Set the initial position
-        sprite1.setPosition(200.0f, 400.0f);
+        sprite1.setPosition(250.0f, 400.0f);
 
 
         while (window.isOpen()) { //loop will continue if window is not closed
@@ -47,10 +47,10 @@ int main() {
                 sprite1.move(1.0f, 0.0f);
             }
             if (Keyboard::isKeyPressed(Keyboard::Up)) {
-                sprite1.move(0.0f, -2.0f);
+                sprite1.move(0.0f, -1.0f);
             }
             if (Keyboard::isKeyPressed(Keyboard::Down)) {
-                sprite1.move(0.0f, 2.0f);
+                sprite1.move(0.0f, 1.0f);
             }
 
 
