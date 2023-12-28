@@ -4,6 +4,7 @@
 
 
 #include <bits/stdc++.h>
+#include<SFML/Graphics.hpp>
 #include<SFML/Window.hpp>
 
 
@@ -46,7 +47,7 @@ public:
 class animation_t{
 
 public:
-    wchar_t name[256];
+    wstring name; //using wstring class
     int frame_start;
     int frame_end;
     float speed;
@@ -58,11 +59,67 @@ public:
 
 };
 
+class sprite_t{
+
+public:
+
+    wstring file_name; //using wstring class
+    Image bitmap;
+    Color color_mask;
+    int width;
+    int height;
+    float scale;
+    int draw_top;
+    int frames_per_row;
+    int frame;
+    int frame_x;
+    int frame_y;
+    bool flag;
+    vector<animation_t>animations;  //using vector class provided by STL
+    int animation_max;
+    int animation_count;
+    int animation_current;
+    double animation_time;
 
 
+};
+
+class game_object_t{
+
+    public:
+       vector3d_t position;
+
+};
+
+#define BBOX_MAIN 0
+#define BBOX_HEAD 1
+#define BBOX_CHEST 2
+#define BBOX_FIST 3
+#define BBOX_LEGS 4
 
 
+class character_t{
 
+   public:
+
+    wstring name;
+    vector3d_t position,velocity;
+    int on_ground;
+    int direction;
+    int prev_state;
+    int state;
+    int state_on_enter;
+    vector<sprite_t> sprite;
+    float health;
+    vector<FloatRect> hit_boxes; //using FloatRect class for handling 2d rectangles with floating-point precision
+    int hit_box_count;
+    int visible;
+
+};
+
+#define ENEMY_TYPE_FERRIS 1
+#define ENEMY_TYPE_GNEISS 2
+#define ENEMY_TYPE_BUTCHER 3
 
 
 
