@@ -37,9 +37,9 @@ using namespace sf;
 class vector3d_t{
 
 public:
-    vector3d_t(){
+
         float x,y,z;
-    }
+
 
 };
 
@@ -48,7 +48,7 @@ public:
 class animation_t{
 
 public:
-    animation_t(){
+
 
         wstring name; //using wstring class
         int frame_start;
@@ -60,7 +60,7 @@ public:
         int animation_ended;
 
 
-    }
+
 
 
 
@@ -69,27 +69,26 @@ public:
 class sprite_t{
 
 public:
-    sprite_t(){
 
-        wstring file_name; //using wstring class
-        Image image;
-        Color color_mask;
-        int width;
-        int height;
-        float scale;
-        int draw_top;
-        int frames_per_row;
-        int frame;
-        int frame_x;
-        int frame_y;
-        bool flag;
-        animation_t *animations;
-        int animation_max;
-        int animation_count;
-        int animation_current;
-        double animation_time;
 
-    }
+       wstring file_name; //using wstring class
+       Image image;
+       Color color_mask;
+       int width;
+       int height;
+       float scale;
+       int draw_top;
+       int frames_per_row;
+       int frame;
+       int frame_x;
+       int frame_y;
+       bool flag;
+       vector<animation_t>animations;
+       int animation_max;
+       int animation_count;
+       int animation_current;
+       double animation_time;
+
 
 
 
@@ -98,9 +97,9 @@ public:
 class game_object_t{
 
     public:
-    game_object_t(){
+
         vector3d_t position;
-    }
+
 
 
 };
@@ -115,21 +114,21 @@ class game_object_t{
 class character_t{
 
    public:
-    character_t(){
-        wstring name;
-        vector3d_t position,velocity;
-        int on_ground;
-        int direction;
-        int prev_state;
-        int state;
-        int state_on_enter;
-        sprite_t *sprite;
-        float health;
-        FloatRect hit_boxes; //using FloatRect class for handling 2d rectangles with floating-point precision
-        int hit_box_count;
-        int visible;
 
-    }
+        wstring name;
+        vector3d_t position{},velocity{};
+        int on_ground{};
+        int direction{};
+        int prev_state{};
+        int state{};
+        int state_on_enter{};
+        vector<sprite_t>sprite;
+        float health{};
+        FloatRect hit_boxes; //using FloatRect class for handling 2d rectangles with floating-point precision
+        int hit_box_count{};
+        int visible{};
+
+
 
 
 
@@ -143,18 +142,18 @@ class character_t{
 class enemy_t : public character_t{
 
    public:
-    enemy_t(){
+
         float movement_speed;
         double animation_time;
         float hit_reset,hit_recover_time,time_to_attack;
         int being_hit,engaging,marked_for_delete;
-        animation_t *walk;
+        vector<animation_t>walk;
         float walk_time;
         int walk_target_idx;
         float target_x,target_z,death_blink_time;
         int type;
         float damage_takes,hit_streak;
-    }
+
 
 
 };
@@ -162,12 +161,12 @@ class enemy_t : public character_t{
 class player_t : public character_t{
 
 public:
-    player_t(){
+
         float movement_speed, hit_recover_time;
         int score;
         float hit_reset,hit_streak;
-        animation_t *anim_upper_cut;
-    }
+        vector<animation_t>anim_upper_cut;
+
 
 };
 
@@ -175,8 +174,6 @@ public:
 class draw_t : public vector3d_t{
 
   public:
-
-    draw_t(){
 
         Image image;
         int flip;
@@ -189,7 +186,7 @@ class draw_t : public vector3d_t{
         int src_height;
         int draw_top;
 
-    }
+
 
 
 };
@@ -197,13 +194,13 @@ class draw_t : public vector3d_t{
 class effect_t : public vector3d_t{
 
    public:
-    effect_t(){
 
-        sprite_t *sprite;
-        int draw_punch;
-        animation_t *anim;
 
-    }
+        vector<sprite_t>sprite;
+        int draw_punch{};
+        vector<animation_t>anim;
+
+
 
 };
 
@@ -211,7 +208,7 @@ class game_t : public effect_t{
 
    public:
 
-    game_t(){
+
         RenderWindow window;
         Image dbl_buffer;
         wstring title;
@@ -221,14 +218,14 @@ class game_t : public effect_t{
         float view_x,view_x_far,rect_width,ground_y,gravity;
         int state;
         string keyboard_state;
-        player_t *player;
-        enemy_t *enemies;
+        vector<player_t>player;
+        vector<enemy_t>enemies;
         int enemy_max,enemy_count;
         Texture img_bg,img_bg_far,img_avatar_player,img_text;
         vector<Texture> img_level_layers;  //using vector class provided by STL
-        sprite_t *level_fire;
+        vector<sprite_t>level_fire;
         float fx_smack_x,fx_smack_y,fx_smack_time;
-        draw_t draw_list;
+        draw_t *draw_list;
         int draw_max;
         int draw_count;
         float max_z;
@@ -238,7 +235,6 @@ class game_t : public effect_t{
         float intro_time;
         int spawn_trigger;
 
-    }
 
 
 };
@@ -254,13 +250,13 @@ void graphics_draw_surface(RenderWindow & window, Image &image, int x, int y, in
                            int src_x, int src_y, int src_w, int src_h, int flip, Color &key);
 void graphics_draw_lifeBar(RenderWindow &window, int x, int y, int height, int width, float life);
 void graphics_swap_buffer(RenderWindow &window,FloatRect &rect);
-player_t* player_new();
+player_t * player_new();
 void player_delete(player_t* player);
 void player_draw(player_t* player, RenderWindow &window);
 void player_update(player_t* player, float dt);
 void player_set_state(player_t* player, int state);
 void character_get_center(character_t* character,vector3d_t* center);
-struct enemy_t* enemy_spawn(int x, int y, int type);
+enemy_t * enemy_spawn(int x, int y, int type);
 void enemy_draw(struct enemy_t* enemy,RenderWindow &window);
 void enemy_update(struct enemy_t* enemy, int index, float dt);
 void enemy_cleanup(struct enemy_t* enemy);
