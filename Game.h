@@ -5,7 +5,7 @@
 
 #include <bits/stdc++.h>
 #include<SFML/Graphics.hpp>
-#include<SFML/Window.hpp>
+
 
 
 using namespace std;
@@ -37,8 +37,9 @@ using namespace sf;
 class vector3d_t{
 
 public:
-
-    float x,y,z;
+    vector3d_t(){
+        float x,y,z;
+    }
 
 };
 
@@ -47,14 +48,20 @@ public:
 class animation_t{
 
 public:
-    wstring name; //using wstring class
-    int frame_start;
-    int frame_end;
-    float speed;
-    int play_once;
-    int reverse_loop;
-    int flag;
-    int animation_ended;
+    animation_t(){
+
+        wstring name; //using wstring class
+        int frame_start;
+        int frame_end;
+        float speed;
+        int play_once;
+        int reverse_loop;
+        int flag;
+        int animation_ended;
+
+
+    }
+
 
 
 };
@@ -62,24 +69,28 @@ public:
 class sprite_t{
 
 public:
+    sprite_t(){
 
-    wstring file_name; //using wstring class
-    Image bitmap;
-    Color color_mask;
-    int width;
-    int height;
-    float scale;
-    int draw_top;
-    int frames_per_row;
-    int frame;
-    int frame_x;
-    int frame_y;
-    bool flag;
-    vector<animation_t>animations;  //using vector class provided by STL
-    int animation_max;
-    int animation_count;
-    int animation_current;
-    double animation_time;
+        wstring file_name; //using wstring class
+        Image image;
+        Color color_mask;
+        int width;
+        int height;
+        float scale;
+        int draw_top;
+        int frames_per_row;
+        int frame;
+        int frame_x;
+        int frame_y;
+        bool flag;
+        animation_t *animations;
+        int animation_max;
+        int animation_count;
+        int animation_current;
+        double animation_time;
+
+    }
+
 
 
 };
@@ -87,7 +98,10 @@ public:
 class game_object_t{
 
     public:
-       vector3d_t position;
+    game_object_t(){
+        vector3d_t position;
+    }
+
 
 };
 
@@ -101,19 +115,23 @@ class game_object_t{
 class character_t{
 
    public:
+    character_t(){
+        wstring name;
+        vector3d_t position,velocity;
+        int on_ground;
+        int direction;
+        int prev_state;
+        int state;
+        int state_on_enter;
+        sprite_t *sprite;
+        float health;
+        FloatRect hit_boxes; //using FloatRect class for handling 2d rectangles with floating-point precision
+        int hit_box_count;
+        int visible;
 
-    wstring name;
-    vector3d_t position,velocity;
-    int on_ground;
-    int direction;
-    int prev_state;
-    int state;
-    int state_on_enter;
-    vector<sprite_t> sprite;
-    float health;
-    vector<FloatRect> hit_boxes; //using FloatRect class for handling 2d rectangles with floating-point precision
-    int hit_box_count;
-    int visible;
+    }
+
+
 
 };
 
@@ -122,11 +140,116 @@ class character_t{
 #define ENEMY_TYPE_BUTCHER 3
 
 
+class enemy_t : public character_t{
+
+   public:
+    enemy_t(){
+        float movement_speed;
+        double animation_time;
+        float hit_reset,hit_recover_time,time_to_attack;
+        int being_hit,engaging,marked_for_delete;
+        animation_t *walk;
+        float walk_time;
+        int walk_target_idx;
+        float target_x,target_z,death_blink_time;
+        int type;
+        float damage_takes,hit_streak;
+    }
+
+
+};
+
+class player_t : public character_t{
+
+public:
+    player_t(){
+        float movement_speed, hit_recover_time;
+        int score;
+        float hit_reset,hit_streak;
+        animation_t *anim_upper_cut;
+    }
+
+};
+
+
+class draw_t : public vector3d_t{
+
+  public:
+
+    draw_t(){
+
+        Image image;
+        int flip;
+        Color color_mask;
+        int width;
+        int height;
+        int src_x;
+        int src_y;
+        int src_width;
+        int src_height;
+        int draw_top;
+
+    }
+
+
+};
+
+class effect_t : public vector3d_t{
+
+   public:
+    effect_t(){
+
+        sprite_t *sprite;
+        int draw_punch;
+        animation_t *anim;
+
+    }
+
+};
+
+class game_t : public effect_t{
+
+   public:
+
+    game_t(){
+        RenderWindow window;
+        Image dbl_buffer;
+        wstring title;
+        int height,width,top_margin;
+        Font font,font_big;
+        double time_elapsed;
+        float view_x,view_x_far,rect_width,ground_y,gravity;
+        int state;
+        string keyboard_state;
+        player_t *player;
+        enemy_t *enemies;
+        int enemy_max,enemy_count;
+        Texture img_bg,img_bg_far,img_avatar_player,img_text;
+        vector<Texture> img_level_layers;  //using vector class provided by STL
+        sprite_t *level_fire;
+        float fx_smack_x,fx_smack_y,fx_smack_time;
+        draw_t draw_list;
+        int draw_max;
+        int draw_count;
+        float max_z;
+        float min_z;
+        float max_view_x;
+        float time_text_blink;
+        float intro_time;
+        int spawn_trigger;
+
+    }
+
+
+};
 
 
 
-
-
+extern game_t *game;
+void vector3d_zero(vector3d_t * vec);
+void graphics_clear();
+void graphics_draw(draw_t * draw);
+void graphics_draw_rect( RenderWindow & window, FloatRect rect, Color color);
 
 
 #endif
