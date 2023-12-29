@@ -254,16 +254,7 @@ void graphics_draw_surface(RenderWindow & window, Image &image, int x, int y, in
                            int src_x, int src_y, int src_w, int src_h, int flip, Color &key);
 void graphics_draw_lifeBar(RenderWindow &window, int x, int y, int height, int width, float life);
 void graphics_swap_buffer(RenderWindow &window,FloatRect &rect);
-sprite_t *sprite_new(wstring &filename, int width, int height, float scale);
-void sprite_delete( sprite_t* sprite);
-void sprite_update( sprite_t* sprite, float dt);
-void sprite_draw(sprite_t* sprite, vector3d_t* pos, int direction, RenderWindow &window);
- animation_t * sprite_add_animation(sprite_t* sprite, wstring &name, int start, int end, int reverse_loop);
- animation_t * sprite_set_animation(sprite_t* sprite, wstring &name);
- animation_t * sprite_current_animation(sprite_t* sprite);
- animation_t* sprite_set_Animation(sprite_t* sprite, wstring &name);
- animation_t* sprite_current_Animation(sprite_t* sprite);
- player_t* player_new();
+player_t* player_new();
 void player_delete(player_t* player);
 void player_draw(player_t* player, RenderWindow &window);
 void player_update(player_t* player, float dt);
