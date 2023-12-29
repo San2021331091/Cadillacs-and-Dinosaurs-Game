@@ -20,10 +20,9 @@ class Animation_Handle{
 
 public:
     static animation_t * sprite_add_animation(sprite_t* sprite, wstring &name, int start, int end, int reverse_loop);
-    animation_t * sprite_set_animation(sprite_t* sprite, wstring &name);
-    animation_t * sprite_current_animation(sprite_t* sprite);
-    animation_t* sprite_set_Animation(sprite_t* sprite, wstring &name);
-    animation_t* sprite_current_Animation(sprite_t* sprite);
+   static animation_t * sprite_set_animation(sprite_t* sprite, wstring &name);
+   static animation_t * sprite_current_animation(sprite_t* sprite);
+
 
 
 };

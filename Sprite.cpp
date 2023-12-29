@@ -45,7 +45,7 @@ animation_t * Animation_Handle :: sprite_add_animation(sprite_t * sprite, wstrin
         sprite->animations.resize(sprite->animation_count + 1);
     }
 
-    animation_t* anim = &sprite->animations[sprite->animation_count];
+    animation_t *anim = &sprite->animations[sprite->animation_count];
     anim->name = name;
     anim->frame_start = start;
     anim->frame_end = end;
@@ -58,6 +58,15 @@ animation_t * Animation_Handle :: sprite_add_animation(sprite_t * sprite, wstrin
     sprite->animation_count++;
 
     return anim;
+}
+
+ animation_t * sprite_current_animation(sprite_t * sprite) {
+    return &sprite->animations[sprite->animation_current];
+}
+
+animation_t * Animation_Handle :: sprite_set_animation(sprite_t *sprite, wstring &name) {
+
+
 
 
 }
