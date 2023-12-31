@@ -1,72 +1,72 @@
 #include <SFML/Graphics.hpp>
+#include <iostream>
+#include <Windows.h>
 
 using namespace sf;
 
 int main() {
-
-    //Rendering a window with close button and TitleBar
     RenderWindow window(VideoMode(1400, 700), "Cadillacs and Dinosaurs Game", Style::Close | Style::Titlebar);
 
-    Image image; //Manipulating and storing image
+    Image backgroundImage;
+    if (backgroundImage.loadFromFile("E:/ClionProjects/Cadillacs and Dinosaurs Game/images/bg1.png")) {
+        Texture backgroundTexture, characterTexture;
+        backgroundTexture.loadFromImage(backgroundImage);
 
-        //Checking whether it is possible to load image from a file or not
-    if (image.loadFromFile("E:/ClionProjects/Cadillacs and Dinosaurs Game/images/bg1.png")) {
+        // Load different images for player movement
+        Texture playerTexture1, playerTexture2;
+        playerTexture1.loadFromFile("E:/ClionProjects/Cadillacs and Dinosaurs Game/images/jack.png");
 
-        Texture texture,texture1; //Encapsulating textures
+        // Use a PNG image with a transparent background
+        playerTexture2.loadFromFile("E:/ClionProjects/Cadillacs and Dinosaurs Game/images/player-jack.png");
 
-        texture.loadFromImage(image);  //Loading texture from an image
+        Sprite backgroundSprite(backgroundTexture), characterSprite(playerTexture1);
 
-        texture1.loadFromFile("E:/ClionProjects/Cadillacs and Dinosaurs Game/images/jack.png"); //Loading texture from an image file
+        characterSprite.setPosition(250.0f, 400.0f);
+        playerTexture2.setSmooth(true);
 
+        Clock clock;
+        float movementSpeed = 200.0f;
 
-        Sprite sprite(texture),sprite1(texture1); //Drawing texture
+        while (window.isOpen()) {
+            Event event{};
+            while (window.pollEvent(event)) {
+                if (event.type == Event::Closed) {
+                    window.close();
+                }
 
-
-        // Set the initial position
-        sprite1.setPosition(250.0f, 400.0f);
-
-
-        while (window.isOpen()) { //loop will continue if window is not closed
-
-            Event event{}; //Defining system event
-
-            while (window.pollEvent(event)) { //Loop will continue if event queue is not empty
-
-                if (event.type == Event::Closed) {  //Checking whether the window is requested to be closed or not
-
-                    window.close();  //Closing the window
+                // Check for 'C' key press to switch player movement image
+                if (event.type == Event::KeyPressed && event.key.code == Keyboard::C) {
+                    characterSprite.setTexture(playerTexture2);
                 }
             }
 
+            float deltaTime = clock.restart().asSeconds();
 
-            // Move the sprite based on keyboard input
-            if (Keyboard::isKeyPressed(Keyboard::Left)) {
-                sprite1.move(-1.0f, 0.0f);
+            // Use the Windows API for keyboard input
+            if (GetAsyncKeyState(VK_LEFT) & 0x8000) {
+                characterSprite.move(-movementSpeed * deltaTime, 0.0f);
             }
-            if (Keyboard::isKeyPressed(Keyboard::Right)) {
-                sprite1.move(1.0f, 0.0f);
+            if (GetAsyncKeyState(VK_RIGHT) & 0x8000) {
+                characterSprite.move(movementSpeed * deltaTime, 0.0f);
             }
-            if (Keyboard::isKeyPressed(Keyboard::Up)) {
-                sprite1.move(0.0f, -1.0f);
+            if (GetAsyncKeyState(VK_UP) & 0x8000) {
+                characterSprite.move(0.0f, -movementSpeed * deltaTime);
             }
-            if (Keyboard::isKeyPressed(Keyboard::Down)) {
-                sprite1.move(0.0f, 1.0f);
+            if (GetAsyncKeyState(VK_DOWN) & 0x8000) {
+                characterSprite.move(0.0f, movementSpeed * deltaTime);
             }
 
-
-
-            // Getting the size of the window
             Vector2u windowSize = window.getSize();
+            backgroundSprite.setScale(static_cast<float>(windowSize.x) / backgroundSprite.getLocalBounds().width,
+                                      static_cast<float>(windowSize.y) / backgroundSprite.getLocalBounds().height);
 
-            // Setting the scale of the sprite to fill the window
-            sprite.setScale(static_cast<float>(windowSize.x) / sprite.getLocalBounds().width,
-                            static_cast<float>(windowSize.y) / sprite.getLocalBounds().height);
-
-            window.clear(); //Clearing the previous contents of the target
-            window.draw(sprite); //Drawing sprite
-            window.draw(sprite1); //Drawing sprite
-            window.display(); //Displaying on the screen
+            window.clear();
+            window.draw(backgroundSprite);
+            window.draw(characterSprite);
+            window.display();
         }
+    } else {
+        std::cerr << "Failed to load background image." << std::endl;
     }
 
     return 0;

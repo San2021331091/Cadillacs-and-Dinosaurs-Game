@@ -9,7 +9,7 @@ public:
      static sprite_t *sprite_new(string &filename, int width, int height, float scale);
     static void sprite_delete( sprite_t* sprite);
     static void sprite_update( sprite_t* sprite, float dt);
-    void sprite_draw(sprite_t* sprite, vector3d_t* pos, int direction, RenderWindow &window);
+    static void sprite_draw(sprite_t* sprite, vector3d_t* pos, int direction, RenderWindow &window);
 
 
 };
@@ -26,6 +26,9 @@ public:
 
 
 };
+
+
+
 
 
 
