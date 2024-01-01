@@ -1,8 +1,12 @@
-#include <SFML/Graphics.hpp>
-#include <iostream>
-#include <Windows.h>
+#include "game.h"
 
-using namespace sf;
+struct game_t* game;
+
+const float PI = 22.0f/7.0;
+
+
+
+
 
 int main() {
     RenderWindow window(VideoMode(1400, 700), "Cadillacs and Dinosaurs Game", Style::Close | Style::Titlebar);
@@ -42,17 +46,16 @@ int main() {
 
             float deltaTime = clock.restart().asSeconds();
 
-            // Use the Windows API for keyboard input
-            if (GetAsyncKeyState(VK_LEFT) & 0x8000) {
+            if (Keyboard::isKeyPressed(Keyboard::Left)) {
                 characterSprite.move(-movementSpeed * deltaTime, 0.0f);
             }
-            if (GetAsyncKeyState(VK_RIGHT) & 0x8000) {
+            if (Keyboard::isKeyPressed(Keyboard::Right)) {
                 characterSprite.move(movementSpeed * deltaTime, 0.0f);
             }
-            if (GetAsyncKeyState(VK_UP) & 0x8000) {
+            if (Keyboard::isKeyPressed(Keyboard::Up)) {
                 characterSprite.move(0.0f, -movementSpeed * deltaTime);
             }
-            if (GetAsyncKeyState(VK_DOWN) & 0x8000) {
+            if (Keyboard::isKeyPressed(Keyboard::Down)) {
                 characterSprite.move(0.0f, movementSpeed * deltaTime);
             }
 
@@ -65,8 +68,6 @@ int main() {
             window.draw(characterSprite);
             window.display();
         }
-    } else {
-        std::cerr << "Failed to load background image." << std::endl;
     }
 
     return 0;

@@ -37,7 +37,7 @@ void Sprite_Handle :: sprite_delete( sprite_t* sprite){
 
 }
 
-animation_t * Animation_Handle :: sprite_add_animation(sprite_t * sprite, wstring &name, int start, int end, int reverse_loop) {
+animation_t * Animation_Handle :: sprite_add_animation(sprite_t * sprite, string &name, int start, int end, int reverse_loop) {
     if (sprite->animation_count >= sprite->animation_max) {
         return nullptr;
     }
@@ -60,62 +60,123 @@ animation_t * Animation_Handle :: sprite_add_animation(sprite_t * sprite, wstrin
     return anim;
 }
 
- animation_t * sprite_current_animation(sprite_t * sprite) {
+ animation_t * Animation_Handle :: sprite_current_animation(sprite_t * sprite) {
     return &sprite->animations[sprite->animation_current];
 }
 
-animation_t * Animation_Handle :: sprite_set_animation(sprite_t *sprite, wstring &name) {
+animation_t * Animation_Handle :: sprite_set_animation(sprite_t *sprite, string &name) {
 
+    for (int i = 0; i < sprite->animation_count; ++i) {
+        animation_t* anim = &sprite->animations[i];
+        if (anim->name == name) {
+            if (sprite->animation_current != i) {
+                sprite->animation_current = i;
+                // Assuming sprite->frame is a valid member in your sprite_t structure
+                sprite->frame = anim->frame_start;
+                anim->flag = 0;
+                anim->animation_ended = 0;
+            }
+            return anim;
+        }
+    }
 
+    return nullptr;
+
+}
+
+void Sprite_Handle ::sprite_update(sprite_t *sprite, float dt) {
+
+    if (sprite->animation_count) {
+        animation_t* anim = &sprite->animations[sprite->animation_current];
+        if (sprite->animation_time <= 0.0) {
+            anim->animation_ended = 0;
+            if (anim->reverse_loop) {
+                if (anim->flag == 0) {
+                    if (sprite->frame < anim->frame_end) {
+                        sprite->frame += 1;
+                    } else {
+                        anim->flag = 1;
+                    }
+                } else {
+                    if (sprite->frame > anim->frame_start) {
+                        sprite->frame -= 1;
+                    } else {
+                        if (anim->play_once == 1) {
+                            sprite->frame = anim->frame_start;
+                            anim->animation_ended = 1;
+                        } else {
+                            anim->flag = 0;
+                        }
+                    }
+                }
+            } else {
+                if (sprite->frame < anim->frame_end)
+                    sprite->frame += 1;
+                else {
+                    if (anim->play_once == 0) {
+                        sprite->frame = anim->frame_start;
+                    } else {
+                        sprite->frame = anim->frame_end;
+                    }
+                    anim->animation_ended = 1;
+                }
+            }
+            sprite->animation_time = 8;
+        }
+
+        sprite->animation_time -= anim->speed * dt;
+    }
 
 
 }
 
 
-void Sprite_Handle :: sprite_draw(sprite_t* sprite, vector3d_t* pos, int direction, RenderWindow& window) {
-    // Assuming sprite->image is loaded and valid
-    Texture texture;
-    texture.loadFromImage(sprite->image);
+    void Sprite_Handle::sprite_draw(sprite_t *sprite, vector3d_t *pos, int direction) {
+        int width = sprite->width;
+        int height = sprite->height;
 
-    // Set the texture for the sprite
-    Sprite spriteSF;
-    spriteSF.setTexture(texture);
+        sprite->frame_x = sprite->frame % sprite->frames_per_row;
+        sprite->frame_y = floor(sprite->frame / sprite->frames_per_row);
 
-    // Set position
-    spriteSF.setPosition(pos->x, pos->y);
+        draw_t draw;
 
-    // Set scale
-    spriteSF.setScale(sprite->scale, sprite->scale);
-
-    // Set the texture rectangle for animation frame
-    int frameWidth = sprite->width / sprite->frames_per_row;
-    int frameHeight = static_cast<int>(sprite->height / (!sprite->animations.empty() ? sprite->animations.size() : 1));
-
-    IntRect textureRect(
-            sprite->frame_x * frameWidth,
-            sprite->frame_y * frameHeight,
-            frameWidth,
-            frameHeight
-    );
-    spriteSF.setTextureRect(textureRect);
-
-    // Draw the sprite to the window
-    window.draw(spriteSF);
-
-    // Update animation frame
-    sprite->animation_time += 0.1; // Assuming a constant frame update for simplicity
-    if (sprite->animation_time >= sprite->animations[sprite->animation_current].speed) {
-        sprite->frame_x++;
-        if (sprite->frame_x >= sprite->frames_per_row) {
-            sprite->frame_x = 0;
-            sprite->frame_y++;
-            if (sprite->frame_y >= sprite->animations[sprite->animation_current].frame_end) {
-                sprite->frame_y = sprite->animations[sprite->animation_current].frame_start;
-                if (sprite->animations[sprite->animation_current].play_once) {
-                    sprite->animations[sprite->animation_current].animation_ended = true;
-                }
-            }
+        if (direction == CHARACTER_DIRECTION_RIGHT)
+            draw.flip = 0;
+        else {
+            draw.flip = 1;
         }
-        sprite->animation_time = 0.0;
+        draw.image = sprite->image;
+        draw.x = pos->x;
+        draw.y = pos->y;
+        draw.z = pos->z;
+        draw.width = width * sprite->scale;
+        draw.height = height * sprite->scale;
+        draw.src_x = (sprite->frame_x * width);
+        draw.src_y = (sprite->frame_y * height);
+        draw.src_width = width;
+        draw.src_height = height;
+        draw.color_mask = sprite->color_mask;
+        draw.draw_top = sprite->draw_top;
+
+        graphics_draw(&draw);
     }
+
+void sprite_draw_2(struct sprite_t* sprite, struct draw_t* draw) {
+    int width = sprite->width;
+    int height = sprite->height;
+
+    sprite->frame_x = sprite->frame % sprite->frames_per_row;
+    sprite->frame_y = floor(sprite->frame / sprite->frames_per_row);
+
+    draw->flip = 0;
+    draw->image = sprite->image;
+    draw->width = width*sprite->scale;
+    draw->height = height*sprite->scale;
+
+    draw->src_x = (sprite->frame_x * width);
+    draw->src_y = (sprite->frame_y * height);
+    draw->src_width = width;
+    draw->src_height = height;
+    draw->color_mask = sprite->color_mask;
+    draw->draw_top = sprite->draw_top;
 }

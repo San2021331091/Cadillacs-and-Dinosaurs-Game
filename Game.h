@@ -38,7 +38,7 @@ class vector3d_t{
 
 public:
 
-        float x,y,z;
+    float x,y,z;
 
 
 };
@@ -50,14 +50,14 @@ class animation_t{
 public:
 
 
-        wstring name; //using wstring class
-        int frame_start;
-        int frame_end;
-        float speed;
-        int play_once;
-        int reverse_loop;
-        int flag;
-        int animation_ended;
+    string name; //using string class
+    int frame_start;
+    int frame_end;
+    float speed;
+    int play_once;
+    int reverse_loop;
+    int flag;
+    int animation_ended;
 
 
 
@@ -71,23 +71,23 @@ class sprite_t{
 public:
 
 
-       wstring file_name; //using wstring class
-       Image image;
-       Color color_mask;
-       int width;
-       int height;
-       float scale;
-       int draw_top;
-       int frames_per_row;
-       int frame;
-       int frame_x;
-       int frame_y;
-       bool flag;
-       vector<animation_t>animations;
-       int animation_max;
-       int animation_count;
-       int animation_current;
-       double animation_time;
+    string file_name; //using string class
+    Image image;
+    Color color_mask;
+    int width;
+    int height;
+    float scale;
+    int draw_top;
+    int frames_per_row;
+    int frame;
+    int frame_x;
+    int frame_y;
+    bool flag;
+    vector<animation_t>animations;
+    int animation_max;
+    int animation_count;
+    int animation_current;
+    double animation_time;
 
 
 
@@ -96,9 +96,9 @@ public:
 
 class game_object_t{
 
-    public:
+public:
 
-        vector3d_t position;
+    vector3d_t position;
 
 
 
@@ -113,20 +113,20 @@ class game_object_t{
 
 class character_t{
 
-   public:
+public:
 
-        wstring name;
-        vector3d_t position{},velocity{};
-        int on_ground{};
-        int direction{};
-        int prev_state{};
-        int state{};
-        int state_on_enter{};
-        vector<sprite_t>sprite;
-        float health{};
-        FloatRect hit_boxes; //using FloatRect class for handling 2d rectangles with floating-point precision
-        int hit_box_count{};
-        int visible{};
+    string name;
+    vector3d_t position{},velocity{};
+    int on_ground{};
+    int direction{};
+    int prev_state{};
+    int state{};
+    int state_on_enter{};
+    vector<sprite_t>sprite;
+    float health{};
+    FloatRect hit_boxes; //using FloatRect class for handling 2d rectangles with floating-point precision
+    int hit_box_count{};
+    int visible{};
 
 
 
@@ -141,18 +141,18 @@ class character_t{
 
 class enemy_t : public character_t{
 
-   public:
+public:
 
-        float movement_speed;
-        double animation_time;
-        float hit_reset,hit_recover_time,time_to_attack;
-        int being_hit,engaging,marked_for_delete;
-        vector<animation_t>walk;
-        float walk_time;
-        int walk_target_idx;
-        float target_x,target_z,death_blink_time;
-        int type;
-        float damage_takes,hit_streak;
+    float movement_speed;
+    double animation_time;
+    float hit_reset,hit_recover_time,time_to_attack;
+    int being_hit,engaging,marked_for_delete;
+    vector<animation_t>walk;
+    float walk_time;
+    int walk_target_idx;
+    float target_x,target_z,death_blink_time;
+    int type;
+    float damage_takes,hit_streak;
 
 
 
@@ -162,10 +162,10 @@ class player_t : public character_t{
 
 public:
 
-        float movement_speed, hit_recover_time;
-        int score;
-        float hit_reset,hit_streak;
-        vector<animation_t>anim_upper_cut;
+    float movement_speed, hit_recover_time;
+    int score;
+    float hit_reset,hit_streak;
+    vector<animation_t>anim_upper_cut;
 
 
 };
@@ -173,18 +173,18 @@ public:
 
 class draw_t : public vector3d_t{
 
-  public:
+public:
 
-        Image image;
-        int flip;
-        Color color_mask;
-        int width;
-        int height;
-        int src_x;
-        int src_y;
-        int src_width;
-        int src_height;
-        int draw_top;
+    Image image;
+    int flip;
+    Color color_mask;
+    int width;
+    int height;
+    int src_x;
+    int src_y;
+    int src_width;
+    int src_height;
+    int draw_top;
 
 
 
@@ -193,12 +193,12 @@ class draw_t : public vector3d_t{
 
 class effect_t : public vector3d_t{
 
-   public:
+public:
 
 
-        vector<sprite_t>sprite;
-        int draw_punch{};
-        vector<animation_t>anim;
+    vector<sprite_t>sprite;
+    int draw_punch{};
+    vector<animation_t>anim;
 
 
 
@@ -206,34 +206,34 @@ class effect_t : public vector3d_t{
 
 class game_t : public effect_t{
 
-   public:
+public:
 
 
-        RenderWindow window;
-        Image dbl_buffer;
-        wstring title;
-        int height,width,top_margin;
-        Font font,font_big;
-        double time_elapsed;
-        float view_x,view_x_far,rect_width,ground_y,gravity;
-        int state;
-        string keyboard_state;
-        vector<player_t>player;
-        vector<enemy_t>enemies;
-        int enemy_max,enemy_count;
-        Texture img_bg,img_bg_far,img_avatar_player,img_text;
-        vector<Texture> img_level_layers;  //using vector class provided by STL
-        vector<sprite_t>level_fire;
-        float fx_smack_x,fx_smack_y,fx_smack_time;
-        draw_t *draw_list;
-        int draw_max;
-        int draw_count;
-        float max_z;
-        float min_z;
-        float max_view_x;
-        float time_text_blink;
-        float intro_time;
-        int spawn_trigger;
+    RenderWindow window;
+    Image dbl_buffer;
+    string title;
+    int height,width,top_margin;
+    Font font,font_big;
+    double time_elapsed;
+    float view_x,view_x_far,rect_width,ground_y,gravity;
+    int state;
+    string keyboard_state;
+    vector<player_t>player;
+    vector<enemy_t>enemies;
+    int enemy_max,enemy_count;
+    Texture img_bg,img_bg_far,img_avatar_player,img_text;
+    vector<Texture> img_level_layers;  //using vector class provided by STL
+    vector<sprite_t>level_fire;
+    float fx_smack_x,fx_smack_y,fx_smack_time;
+    draw_t *draw_list;
+    int draw_max;
+    int draw_count;
+    float max_z;
+    float min_z;
+    float max_view_x;
+    float time_text_blink;
+    float intro_time;
+    int spawn_trigger;
 
 
 
