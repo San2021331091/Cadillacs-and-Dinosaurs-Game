@@ -39,7 +39,7 @@ void Sprite_Handle :: sprite_delete( sprite_t* sprite){
 
 animation_t* Animation_Handle::sprite_add_animation(vector<sprite_t>& sprites, const string& name, int start, int end, int reverse_loop) {
     if (sprites.empty()) {
-        return nullptr;  // The vector is empty, cannot add animation
+        return nullptr;
     }
 
     for (sprite_t& sprite : sprites) {
