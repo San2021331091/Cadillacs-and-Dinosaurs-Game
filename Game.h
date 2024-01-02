@@ -116,21 +116,17 @@ class character_t{
 public:
 
     string name;
-    vector3d_t position{},velocity{};
-    int on_ground{};
-    int direction{};
-    int prev_state{};
-    int state{};
-    int state_on_enter{};
+    vector3d_t position,velocity;
+    int on_ground;
+    int direction;
+    int prev_state;
+    int state;
+    int state_on_enter;
     vector<sprite_t>sprite;
-    float health{};
-    FloatRect hit_boxes; //using FloatRect class for handling 2d rectangles with floating-point precision
-    int hit_box_count{};
-    int visible{};
-
-
-
-
+    float health;
+    vector<FloatRect> hit_boxes;//using FloatRect class for handling 2d rectangles with floating-point precision
+    int hit_box_count;
+    int visible;
 
 };
 
@@ -185,9 +181,6 @@ public:
     int src_width;
     int src_height;
     int draw_top;
-
-
-
 
 };
 
@@ -250,11 +243,6 @@ void graphics_draw_surface(RenderWindow & window, Image &image, int x, int y, in
                            int src_x, int src_y, int src_w, int src_h, int flip, Color &key);
 void graphics_draw_lifeBar(RenderWindow &window, int x, int y, int height, int width, float life);
 void graphics_swap_buffer(RenderWindow &window,FloatRect &rect);
-player_t * player_new();
-void player_delete(player_t* player);
-void player_draw(player_t* player, RenderWindow &window);
-void player_update(player_t* player, float dt);
-void player_set_state(player_t* player, int state);
 void character_get_center(character_t* character,vector3d_t* center);
 enemy_t * enemy_spawn(int x, int y, int type);
 void enemy_draw(struct enemy_t* enemy,RenderWindow &window);

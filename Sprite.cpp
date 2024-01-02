@@ -1,20 +1,20 @@
 #include "Sprite.h"
 
 
-sprite_t * Sprite_Handle :: sprite_new(string &filename, int width, int height, float scale){
+initializer_list<sprite_t> Sprite_Handle::sprite_new(const string& filename, int width, int height, float scale) {
+    auto* s = new sprite_t;
 
-    auto * s = new sprite_t();
     s->image.loadFromFile(filename);
     Texture texture;
     texture.loadFromImage(s->image);
     Sprite sprite(texture);
-    s->color_mask.r=0;
-    s->color_mask.g=0;
-    s->color_mask.b=248;
+    s->color_mask.r = 0;
+    s->color_mask.g = 0;
+    s->color_mask.b = 248;
     s->width = width;
     s->height = height;
     s->scale = scale;
-    s->draw_top = 0;
+    s->draw_top = false;
     s->frames_per_row = 6;
     s->frame = 0;
     s->frame_x = 0;
@@ -25,10 +25,10 @@ sprite_t * Sprite_Handle :: sprite_new(string &filename, int width, int height, 
     s->animation_time = 0.0f;
     s->animation_count = 0;
     s->animation_current = 0;
-    return s;
 
-
+    return reinterpret_cast<const initializer_list<sprite_t> &>(s);
 }
+
 
 void Sprite_Handle :: sprite_delete( sprite_t* sprite){
 
@@ -37,28 +37,33 @@ void Sprite_Handle :: sprite_delete( sprite_t* sprite){
 
 }
 
-animation_t * Animation_Handle :: sprite_add_animation(sprite_t * sprite, string &name, int start, int end, int reverse_loop) {
-    if (sprite->animation_count >= sprite->animation_max) {
-        return nullptr;
-    }
-    if (sprite->animation_count >= sprite->animations.size()) {
-        sprite->animations.resize(sprite->animation_count + 1);
+animation_t* Animation_Handle::sprite_add_animation(vector<sprite_t>& sprites, const string& name, int start, int end, int reverse_loop) {
+    if (sprites.empty()) {
+        return nullptr;  // The vector is empty, cannot add animation
     }
 
-    animation_t *anim = &sprite->animations[sprite->animation_count];
-    anim->name = name;
-    anim->frame_start = start;
-    anim->frame_end = end;
-    anim->speed = 1.0f;
-    anim->reverse_loop = reverse_loop;
-    anim->play_once = 0;
-    anim->flag = 0;
-    anim->animation_ended = 0;
-    sprite->animation_current = sprite->animation_count;
-    sprite->animation_count++;
+    for (sprite_t& sprite : sprites) {
+        if (sprite.animation_count >= sprite.animations.size()) {
+            sprite.animations.resize(sprite.animation_count + 1);
+        }
 
-    return anim;
+        animation_t* anim = &sprite.animations[sprite.animation_count];
+        anim->name = name;
+        anim->frame_start = start;
+        anim->frame_end = end;
+        anim->speed = 1.0f;
+        anim->reverse_loop = reverse_loop;
+        anim->play_once = 0;
+        anim->flag = 0;
+        anim->animation_ended = 0;
+        sprite.animation_current = sprite.animation_count;
+        sprite.animation_count++;
+    }
+
+    // Return the animation of the first sprite in the vector
+    return &sprites[0].animations[sprites[0].animation_count - 1];
 }
+
 
  animation_t * Animation_Handle :: sprite_current_animation(sprite_t * sprite) {
     return &sprite->animations[sprite->animation_current];
@@ -158,10 +163,10 @@ void Sprite_Handle ::sprite_update(sprite_t *sprite, float dt) {
         draw.color_mask = sprite->color_mask;
         draw.draw_top = sprite->draw_top;
 
-        graphics_draw(&draw);
+
     }
 
-void sprite_draw_2(struct sprite_t* sprite, struct draw_t* draw) {
+void Sprite_Handle :: sprite_draw_2(sprite_t* sprite, draw_t* draw) {
     int width = sprite->width;
     int height = sprite->height;
 

@@ -4,10 +4,6 @@ struct game_t* game;
 
 const float PI = 22.0f/7.0;
 
-
-
-
-
 int main() {
     RenderWindow window(VideoMode(1400, 700), "Cadillacs and Dinosaurs Game", Style::Close | Style::Titlebar);
 
