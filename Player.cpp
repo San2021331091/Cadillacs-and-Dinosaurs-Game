@@ -1,6 +1,6 @@
 #include "Player.h"
 #include "Sprite.h"
-
+#include "Utils.h"
 
 player_t * Player :: player_new() {
 
@@ -176,7 +176,20 @@ void Player :: player_update_state(player_t *player, float dt) {
 
     }
 }
+void Player::player_calculate_hit_boxes(player_t* player) {
+    player->hit_boxes.clear();
+    if (!player->sprite.empty()) {
+        int currentFrame = player->sprite[0].frame;
+        sprite_t& currentSprite = player->sprite[currentFrame];
+        float playerX = player->position.x;
+        float playerY = player->position.y;
 
+        player->hit_boxes.emplace_back(playerX, playerY, currentSprite.width, currentSprite.height);
+    }
+
+    // Update the hit box count
+    player->hit_box_count = static_cast<int>(player->hit_boxes.size());
+}
 
 
 void Player::player_update(player_t* player, float dt) {

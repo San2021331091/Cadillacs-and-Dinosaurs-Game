@@ -235,7 +235,7 @@ public:
 
 
 extern game_t *game;
-void vector3d_zero(vector3d_t * vec);
+
 void graphics_clear();
 void graphics_draw(draw_t * draw);
 void graphics_draw_rect( RenderWindow & window, FloatRect &rect, Color &color);
@@ -250,12 +250,6 @@ void enemy_update(struct enemy_t* enemy, int index, float dt);
 void enemy_cleanup(struct enemy_t* enemy);
 void player_calculate_hit_boxes(player_t* player);
 void enemy_calculate_hit_boxes(enemy_t* enemy) ;
-float get_randf(float a, float b);
-int get_rand(int min, int max);
-Font create_font(string &name, int size);
-
-
-
 
 #endif
 
