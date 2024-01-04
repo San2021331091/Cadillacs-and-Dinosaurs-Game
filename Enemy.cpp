@@ -743,3 +743,45 @@ void Enemy ::enemy_do_ai(enemy_t *enemy, float dt) {
         }
     }
 }
+
+
+void Enemy :: enemy_update(enemy_t* enemy, float dt) {
+
+    Vector2u windowSize = game->window.getSize();
+    FloatRect floatRect;
+    floatRect.left = 0.0f;
+    floatRect.top = 0.0f;
+    floatRect.width = static_cast<float>(windowSize.x);
+    floatRect.height = static_cast<float>(windowSize.y);
+    character_t* ch = enemy;
+    vector<sprite_t> sprite = ch->sprite;
+
+    //vector3d_t old_pos = ch->position;
+
+   Sprite_Handle:: sprite_update(sprite, dt);
+
+    // this will only change the states, won't modify position or velocity
+    Enemy:: enemy_do_ai(enemy, dt);
+
+    ch->velocity.y += (float)(game->gravity * 0.3 * dt);
+
+    ch->position.x += ch->velocity.x * dt;
+    ch->position.y += ch->velocity.y * dt;
+    ch->position.z += ch->velocity.z * dt;
+
+    if (ch->position.y > game->ground_y) {
+
+        if (ch->velocity.y > 2) {
+            ch->velocity.y = -(float)(ch->velocity.y * 0.6);
+        } else {
+            ch->position.y = game->ground_y;
+            ch->velocity.y = 0;
+            ch->on_ground = 1;
+        }
+    } else {
+        ch->on_ground = 0;
+    }
+
+   Character::enemy_calculate_hit_boxes(enemy);
+
+}
