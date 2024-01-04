@@ -19,10 +19,10 @@ player_t * Player :: player_new() {
     player->hit_streak = 0;
     player->position.x = 350;
     player->position.y = game->ground_y;
-    player->hit_boxes.resize(10);
+    player->hit_boxes = new FloatRect[10];
     player->hit_box_count = 0;
-    vector3d_zero(&player->position);
-    vector3d_zero(&player->velocity);
+    Utils::vector3d_zero(&player->position);
+    Utils::vector3d_zero(&player->velocity);
     animation_t *a;
     Animation_Handle :: sprite_add_animation(player->sprite, "idle", 0, 0, 0);
     a = Animation_Handle :: sprite_add_animation(player->sprite, "walk", 1, 12, 0);
@@ -176,20 +176,6 @@ void Player :: player_update_state(player_t *player, float dt) {
 
     }
 }
-void Player::player_calculate_hit_boxes(player_t* player) {
-    player->hit_boxes.clear();
-    if (!player->sprite.empty()) {
-        int currentFrame = player->sprite[0].frame;
-        sprite_t& currentSprite = player->sprite[currentFrame];
-        float playerX = player->position.x;
-        float playerY = player->position.y;
-
-        player->hit_boxes.emplace_back(playerX, playerY, currentSprite.width, currentSprite.height);
-    }
-
-    // Update the hit box count
-    player->hit_box_count = static_cast<int>(player->hit_boxes.size());
-}
 
 
 void Player::player_update(player_t* player, float dt) {
@@ -227,7 +213,7 @@ void Player::player_update(player_t* player, float dt) {
             ch->on_ground = 0;
         }
 
-        Player :: player_calculate_hit_boxes(player);
+       // Player :: player_calculate_hit_boxes(player);
 
         FloatRect viewport = game->window.getView().getViewport();
         float left = viewport.left * static_cast<float>(windowSize.x);

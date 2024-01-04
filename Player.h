@@ -13,7 +13,7 @@ public:
     static void player_update_state(player_t* player, float dt);
     static void player_update(player_t* player, float dt);
     static void player_set_state(player_t* player, int state);
-    static void player_calculate_hit_boxes(player_t* player);
+
 
 
 };

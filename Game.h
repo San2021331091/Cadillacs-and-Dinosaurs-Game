@@ -124,7 +124,7 @@ public:
     int state_on_enter;
     vector<sprite_t>sprite;
     float health;
-    vector<FloatRect> hit_boxes;//using FloatRect class for handling 2d rectangles with floating-point precision
+    FloatRect * hit_boxes;
     int hit_box_count;
     int visible;
 
@@ -190,8 +190,8 @@ public:
 
 
     vector<sprite_t>sprite;
-    int draw_punch{};
-    vector<animation_t>anim;
+    int draw_punch;
+    animation_t *anim;
 
 
 
@@ -243,13 +243,11 @@ void graphics_draw_surface(RenderWindow & window, Image &image, int x, int y, in
                            int src_x, int src_y, int src_w, int src_h, int flip, Color &key);
 void graphics_draw_lifeBar(RenderWindow &window, int x, int y, int height, int width, float life);
 void graphics_swap_buffer(RenderWindow &window,FloatRect &rect);
-void character_get_center(character_t* character,vector3d_t* center);
 enemy_t * enemy_spawn(int x, int y, int type);
 void enemy_draw(struct enemy_t* enemy,RenderWindow &window);
 void enemy_update(struct enemy_t* enemy, int index, float dt);
 void enemy_cleanup(struct enemy_t* enemy);
-void player_calculate_hit_boxes(player_t* player);
-void enemy_calculate_hit_boxes(enemy_t* enemy) ;
+
 
 #endif
 

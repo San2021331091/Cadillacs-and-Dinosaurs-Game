@@ -162,7 +162,7 @@ void Sprite_Handle :: sprite_draw(vector<sprite_t>& sprites, vector3d_t* pos, in
         draw.src_height = height;
         draw.color_mask = sprite.color_mask;
         draw.draw_top = sprite.draw_top;
-        graphics_draw(&draw);
+        //graphics_draw(&draw);
 
     }
 }
