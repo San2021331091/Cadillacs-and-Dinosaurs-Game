@@ -65,7 +65,7 @@ animation_t* Animation_Handle::sprite_add_animation(vector<sprite_t>& sprites, c
 }
 
 
- animation_t * Animation_Handle :: sprite_current_animation(sprite_t * sprite) {
+ vector<animation_t> * Animation_Handle :: sprite_current_animation(sprite_t * sprite) {
     return &sprite->animations[sprite->animation_current];
 }
 

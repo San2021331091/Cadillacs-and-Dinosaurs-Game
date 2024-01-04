@@ -197,7 +197,7 @@ public:
 
 };
 
-class game_t : public effect_t{
+class game_t{
 
 public:
 
@@ -210,6 +210,7 @@ public:
     double time_elapsed;
     float view_x,view_x_far,rect_width,ground_y,gravity;
     int state;
+    effect_t fx_punch,fx_blood;
     string keyboard_state;
     vector<player_t>player;
     vector<enemy_t>enemies;

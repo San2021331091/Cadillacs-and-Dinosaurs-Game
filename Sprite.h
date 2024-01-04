@@ -21,7 +21,7 @@ class Animation_Handle{
 public:
     static animation_t * sprite_add_animation(vector<sprite_t>& sprites, const string &name, int start, int end, int reverse_loop);
    static animation_t * sprite_set_animation(vector<sprite_t>& sprites, const string &name);
-   static animation_t * sprite_current_animation(sprite_t* sprite);
+   static vector<animation_t> * sprite_current_animation(sprite_t* sprite);
 
 
 
