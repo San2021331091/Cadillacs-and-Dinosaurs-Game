@@ -135,7 +135,7 @@ public:
 #define ENEMY_TYPE_BUTCHER 3
 
 
-class enemy_t : public character_t{
+class enemy_t : public character_t,public sprite_t{
 
 public:
 
@@ -244,10 +244,7 @@ void graphics_draw_surface(RenderWindow & window, Image &image, int x, int y, in
                            int src_x, int src_y, int src_w, int src_h, int flip, Color &key);
 void graphics_draw_lifeBar(RenderWindow &window, int x, int y, int height, int width, float life);
 void graphics_swap_buffer(RenderWindow &window,FloatRect &rect);
-enemy_t * enemy_spawn(int x, int y, int type);
-void enemy_draw(struct enemy_t* enemy,RenderWindow &window);
-void enemy_update(struct enemy_t* enemy, int index, float dt);
-void enemy_cleanup(struct enemy_t* enemy);
+
 
 
 #endif

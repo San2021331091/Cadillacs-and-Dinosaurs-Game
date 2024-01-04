@@ -73,7 +73,7 @@ void Player ::player_set_state(player_t *player, int state) {
     for (auto &sprite : *sprites) {
 
         if (ch->state == CHARACTER_STATE_FIGHT) {
-            animation_t* anim = Animation_Handle::sprite_current_animation(&sprite);
+            auto* anim = reinterpret_cast<animation_t *>(Animation_Handle::sprite_current_animation(&sprite));
             if (!anim->animation_ended) {
                 return;
             }
@@ -146,7 +146,7 @@ void Player :: player_update_state(player_t *player, float dt) {
             }
         }
         if (ch->state == CHARACTER_STATE_FIGHT) {
-            animation_t *anim = Animation_Handle::sprite_current_animation(&sprite);
+            auto *anim = reinterpret_cast<animation_t *>(Animation_Handle::sprite_current_animation(&sprite));
             if (anim->animation_ended) {
                 player_set_state(player, CHARACTER_STATE_IDLE);
             }
@@ -165,7 +165,7 @@ void Player :: player_update_state(player_t *player, float dt) {
 
         }
         else if (ch->state == CHARACTER_STATE_JUMP) {
-            animation_t* anim = Animation_Handle::sprite_current_animation(&sprite);
+            auto* anim = reinterpret_cast<animation_t *>(Animation_Handle::sprite_current_animation(&sprite));
 
             if (anim->animation_ended) {
                 player_set_state(player, CHARACTER_STATE_IDLE);

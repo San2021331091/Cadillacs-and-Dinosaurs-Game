@@ -29,15 +29,13 @@ initializer_list<sprite_t> Sprite_Handle::sprite_new(const string& filename, int
     return reinterpret_cast<const initializer_list<sprite_t> &>(s);
 }
 
-
-void Sprite_Handle :: sprite_delete( sprite_t* sprite){
-
-         sprite->animations.clear();
-         delete sprite;
-
+void Sprite_Handle :: sprite_delete(sprite_t* sprite) {
+    sprite->animations.clear();
+    free(sprite);
 }
 
-animation_t* Animation_Handle::sprite_add_animation(vector<sprite_t>& sprites, const string& name, int start, int end, int reverse_loop) {
+
+animation_t *Animation_Handle::sprite_add_animation(vector<sprite_t>& sprites, const string& name, int start, int end, int reverse_loop) {
     if (sprites.empty()) {
         return nullptr;
     }
@@ -60,13 +58,12 @@ animation_t* Animation_Handle::sprite_add_animation(vector<sprite_t>& sprites, c
         sprite.animation_count++;
     }
 
-    // Return the animation of the first sprite in the vector
     return &sprites[0].animations[sprites[0].animation_count - 1];
 }
 
 
  vector<animation_t> * Animation_Handle :: sprite_current_animation(sprite_t * sprite) {
-    return &sprite->animations[sprite->animation_current];
+    return reinterpret_cast<vector<animation_t> *>(&sprite->animations[sprite->animation_current]);
 }
 
 animation_t* Animation_Handle::sprite_set_animation(vector<sprite_t>& sprites, const string& name) {
@@ -154,8 +151,8 @@ void Sprite_Handle :: sprite_draw(vector<sprite_t>& sprites, vector3d_t* pos, in
         draw.x = pos->x;
         draw.y = pos->y;
         draw.z = pos->z;
-        draw.width = width * sprite.scale;
-        draw.height = height * sprite.scale;
+        draw.width = width * (int)sprite.scale;
+        draw.height = height * (int) sprite.scale;
         draw.src_x = (sprite.frame_x * width);
         draw.src_y = (sprite.frame_y * height);
         draw.src_width = width;
@@ -177,8 +174,8 @@ void Sprite_Handle :: sprite_draw_2(sprite_t* sprite, draw_t* draw) {
 
     draw->flip = 0;
     draw->image = sprite->image;
-    draw->width = width*sprite->scale;
-    draw->height = height*sprite->scale;
+    draw->width = width * (int)sprite->scale;
+    draw->height = height * (int) sprite->scale;
 
     draw->src_x = (sprite->frame_x * width);
     draw->src_y = (sprite->frame_y * height);
