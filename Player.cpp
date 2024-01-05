@@ -60,9 +60,11 @@ void Player :: player_delete(player_t* player) {
 }
 
 
-void Player :: player_draw(player_t* player) {
-    if (player->visible == 1) {
-        Sprite_Handle :: sprite_draw(player->sprite, &player->position, player->direction);
+void Player :: player_draw(vector<player_t>*players) {
+    for (auto &player: *players) {
+        if (player.visible == 1) {
+            Sprite_Handle::sprite_draw(player.sprite, &player.position, player.direction);
+        }
     }
 }
 

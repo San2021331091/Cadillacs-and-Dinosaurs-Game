@@ -134,9 +134,10 @@ enemy_t * Enemy ::enemy_spawn(int x, int z, int type) {
 
     }
 
-void Enemy :: enemy_draw(enemy_t* enemy) {
+void Enemy :: enemy_draw(enemy_t* enemy, RenderWindow &window) {
     if (enemy->visible == 1) {
         Sprite_Handle :: sprite_draw(enemy->sprite, &enemy->position, enemy->direction);
+
     }
 }
 

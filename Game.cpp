@@ -3,6 +3,7 @@
 #include "Utils.h"
 #include "Player.h"
 #include "Enemy.h"
+#include "Graphics.h"
 
 game_t* game;
 
@@ -10,6 +11,7 @@ const float PI = 22.0f/7.0;
 void handleEvents();
 void game_spawn_enemies();
 void game_draw_debug(RenderWindow &window);
+void character_get_center(character_t *character, vector3d_t *center);
 void game_init_dblBuffer() {
 
     RenderTexture dblBuffer; //target for off-screen 2d rendering into a texture
@@ -307,10 +309,246 @@ void game_draw_level_fire(RenderWindow& window, FloatRect &rect) {
     sprite.setPosition((-game->view_x) + game->max_view_x + gap, 0);
 
     window.draw(sprite);
+    Graphics::graphics_draw_surface(window, draw.image,
+                                    (int)((-game->view_x) + game->max_view_x + gap), 0, (int)scaled_width, (int)(rect.top+rect.height) ,
+                          draw.src_x, draw.src_y, draw.src_width, draw.src_height,
+                          draw.flip, draw.color_mask);
 }
 
 
+void game_draw(RenderWindow &window,FloatRect rect){
 
+    const int state = game->state;
+    string buf;
+    Graphics:: graphics_clear();
+    Text text;
+    text.setFillColor(Color(255, 255, 0)); // Set the text color
+    text.setOutlineColor(Color::Transparent);
+// Draw the text to the window
+    window.draw(text);
+
+    if (state == GAME_STATE_MENU) {
+        // draw the moving background
+        game_draw_level(window, rect);
+        if (game->time_text_blink < 50 ) {
+            text.setString("Press Enter to Start");
+            text.setCharacterSize(22);
+            text.setFillColor(sf::Color::White); // Set the text color
+            text.setStyle(Text::Bold); // Set the text style if needed
+// To center the text horizontally and vertically
+            FloatRect textBounds = text.getLocalBounds();
+            text.setOrigin(textBounds.width / 2, textBounds.height / 2);
+            text.setPosition((float)window.getSize().x / 2, (float)window.getSize().y / 2);
+// Draw the text to the window
+            window.draw(text);
+        }
+
+
+
+        }
+
+
+    else if (state == GAME_STATE_PLAYING ||
+             state == GAME_STATE_PAUSED ||
+             state == GAME_STATE_OVER ||
+             state == GAME_STATE_INTRO ||
+             state == GAME_STATE_CUTSCENE ||
+             state == GAME_STATE_WIN) {
+
+
+
+
+        game_draw_level(window, rect);
+        game_draw_level_fire(window, rect);
+
+        for(int i = 0;i < game->enemy_count;i++) {
+            struct enemy_t* enemy = &game->enemies[i];
+           Enemy:: enemy_draw(enemy, window);
+        }
+        Player::player_draw(&game->player);
+
+        effect_draw(&game->fx_punch);
+        effect_draw(&game->fx_blood);
+
+        Graphics::graphics_swap_buffer(window);
+
+        for(int i = 0;i < game->enemy_count;i++) {
+            struct enemy_t* enemy = &game->enemies[i];
+            struct character_t* ch = enemy;
+            if (ch->health > 0 && (enemy->engaging == 1 || ch->state == CHARACTER_STATE_HIT)) {
+                vector3d_t center{};
+                character_get_center(ch, &center);
+                int width = 70;
+                int height = 8;
+                float x = (-game->view_x) + center.x - ((float)(width)/2);
+                sprite_t *sp;
+                float y = ch->position.y + ch->position.z - ((float)sp->height * sp->scale);
+
+               Graphics:: graphics_draw_lifeBar(window, (int)x, (int)y, height, width, ch->health);
+            }
+        }
+
+        if (game->fx_smack_time > 0) {
+
+            Texture texture;
+            texture.loadFromImage(game->img_text);
+            Sprite sprite(texture);
+
+            float width = 130 * 1.2;
+            float height = 107 * 1.2;
+
+            float x = ((-game->view_x) + game->fx_smack_x) - (width / 2);
+            float y = game->fx_smack_y - (height / 2);
+
+            sprite.setPosition(x, y);
+            sprite.setScale(1.2, 1.2);
+
+            // Assuming the color mask is applied to the entire texture
+            sf::Color colorMask(0, 0, 248);
+            sprite.setColor(colorMask);
+
+            window.draw(sprite);
+        }
+
+
+
+       // game_draw_level_layers(window, rect);
+        text.setFont(game->font);
+        text.setOutlineColor(Color::Transparent); // Set outline color
+        text.setOutlineThickness(2.0f);
+        window.draw(text);
+
+        int player_stat_x = 10;
+
+        game_draw_player_statistics(window, player_stat_x);
+
+        if(state == GAME_STATE_PAUSED) {
+            if (game->time_text_blink < 50 ) {
+                text.setString("Press Enter to Resume");
+                text.setFillColor(Color(255, 255, 0)); // Set text color (RGB: 255, 255, 0)
+                text.setOutlineColor(Color::Transparent); // Set outline color (you can change to another color)
+                text.setOutlineThickness(2.0f);
+                FloatRect textBounds = text.getLocalBounds();
+                text.setOrigin(textBounds.width / 2, textBounds.height / 2);
+                text.setPosition((float)window.getSize().x / 2, (float)window.getSize().y / 2);
+// Draw the text to the window
+                window.draw(text);
+            }
+
+            rect.top -= 50;
+            rect.left-= 50;
+
+            text.setFont(game->font_big);
+            text.setString("Paused");
+            text.setFillColor(Color(255, 255, 0)); // Set text color (RGB: 255, 255, 0)
+// Set outline color and thickness
+            text.setOutlineColor(Color::Transparent); // Set outline color
+            text.setOutlineThickness(2.0f);
+            FloatRect textBounds = text.getLocalBounds();
+            text.setOrigin(textBounds.width / 2, textBounds.height / 2);
+            text.setPosition((float)window.getSize().x / 2, (float)window.getSize().y / 2);
+// Draw the text to the window
+            window.draw(text);
+
+                    }
+
+
+        else if(state == GAME_STATE_WIN) {
+            if (game->time_text_blink < 50 ) {
+                text.setFont(game->font_big);
+                text.setString("You won!!");
+                text.setFillColor(Color(255, 255, 0)); // Set text color (RGB: 255, 255, 0)
+// Set outline color and thickness
+                text.setOutlineColor(Color::Transparent); // Set outline color
+                text.setOutlineThickness(2.0f);
+                FloatRect textBounds = text.getLocalBounds();
+                text.setOrigin(textBounds.width / 2, textBounds.height / 2);
+                text.setPosition((float)window.getSize().x / 2, (float)window.getSize().y / 2);
+// Draw the text to the window
+                window.draw(text);
+            }
+        }
+        else if(state == GAME_STATE_OVER) {
+            if (game->time_text_blink < 50 ) {
+                text.setString("You died!!");
+                text.setFillColor(Color(255, 255, 0)); // Set text color (RGB: 255, 255, 0)
+// Set outline color and thickness
+                text.setOutlineColor(Color::Transparent); // Set outline color
+                text.setOutlineThickness(2.0f);
+                FloatRect textBounds = text.getLocalBounds();
+                text.setOrigin(textBounds.width / 2, textBounds.height / 2);
+                text.setPosition((float)window.getSize().x / 2, (float)window.getSize().y / 2);
+// Draw the text to the window
+                window.draw(text);
+            }
+        }
+        else if (state == GAME_STATE_INTRO) {
+            if (game->intro_time > 200) {
+                text.setString("Ready?");
+                text.setFillColor(Color(255, 255, 0)); // Set text color (RGB: 255, 255, 0)
+// Set outline color and thickness
+                text.setOutlineColor(Color::Transparent); // Set outline color
+                text.setOutlineThickness(2.0f);
+                FloatRect textBounds = text.getLocalBounds();
+                text.setOrigin(textBounds.width / 2, textBounds.height / 2);
+                text.setPosition((float)window.getSize().x / 2, (float)window.getSize().y / 2);
+// Draw the text to the window
+                window.draw(text);
+            } else if (game->intro_time > 100) {
+                text.setString("Steady??");
+                text.setFillColor(Color(255, 255, 0)); // Set text color (RGB: 255, 255, 0)
+// Set outline color and thickness
+                text.setOutlineColor(Color::Transparent); // Set outline color
+                text.setOutlineThickness(2.0f);
+                FloatRect textBounds = text.getLocalBounds();
+                text.setOrigin(textBounds.width / 2, textBounds.height / 2);
+                text.setPosition((float)window.getSize().x / 2, (float)window.getSize().y / 2);
+// Draw the text to the window
+                window.draw(text);
+            } else {
+                text.setString("You died!!");
+                text.setFillColor(Color(255, 255, 0)); // Set text color (RGB: 255, 255, 0)
+                window.draw(text);
+                if (game->time_text_blink < 50 ) {
+                    text.setOutlineColor(Color::Transparent); // Set outline color
+                    text.setOutlineThickness(2.0f);
+                    FloatRect textBounds = text.getLocalBounds();
+                    text.setOrigin(textBounds.width / 2, textBounds.height / 2);
+                    text.setPosition((float)window.getSize().x / 2, (float)window.getSize().y / 2);
+                }
+            }
+        }
+
+    }
+
+
+}
+
+void game_draw_debug(RenderWindow &window) {
+    for(int i = 0;i < game->enemy_count;i++) {
+        enemy_t* enemy = &game->enemies[i];
+        character_t* ch = enemy;
+        for(int j = 0;j < ch->hit_box_count;j++) {
+            FloatRect * box = &ch->hit_boxes[j];
+            Color color(255, 0, 0);
+            Graphics::graphics_draw_rect(window, *box,color );
+        }
+    }
+     character_t *ch;
+    for(int i = 0;i < ch->hit_box_count;i++) {
+        FloatRect * box = &ch->hit_boxes[i];
+        Color color(255, 0, 0);
+        Graphics::graphics_draw_rect(window, *box, color);
+    }
+}
+
+void enemy_remove(int index) {
+    int count = game->enemy_count - 1;
+    for(int i = index; i < count; i++) {
+        game->enemies[i] = game->enemies[i + 1];
+    }
+    game->enemy_count--;
+}
 
 
 int main() {
@@ -343,7 +581,6 @@ int main() {
                     window.close();
                 }
 
-                // Check for 'C' key press to switch player movement image
                 if (event.type == Event::KeyPressed && event.key.code == Keyboard::C) {
                     characterSprite.setTexture(playerTexture2);
                 }
