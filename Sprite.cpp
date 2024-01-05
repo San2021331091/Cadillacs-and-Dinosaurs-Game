@@ -1,4 +1,5 @@
 #include "Sprite.h"
+#include "Graphics.h"
 
 sprite_t* Sprite_Handle::sprite_new(const string& filename, int width, int height, float scale) {
     auto* s = new sprite_t;
@@ -30,7 +31,7 @@ sprite_t* Sprite_Handle::sprite_new(const string& filename, int width, int heigh
 
 
 void Sprite_Handle :: sprite_delete(sprite_t* sprite) {
-    sprite->animations.clear();
+    //sprite->animations.clear();
     free(sprite);
 }
 
@@ -159,7 +160,7 @@ void Sprite_Handle :: sprite_draw(vector<sprite_t>& sprites, vector3d_t* pos, in
         draw.src_height = height;
         draw.color_mask = sprite.color_mask;
         draw.draw_top = sprite.draw_top;
-        //graphics_draw(&draw);
+        Graphics::graphics_draw(&draw);
 
     }
 }

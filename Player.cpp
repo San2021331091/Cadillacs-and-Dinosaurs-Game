@@ -1,6 +1,7 @@
 #include "Player.h"
 #include "Sprite.h"
 #include "Utils.h"
+#include "Character.h"
 
 player_t * Player :: player_new() {
 
@@ -213,7 +214,7 @@ void Player::player_update(player_t* player, float dt) {
             ch->on_ground = 0;
         }
 
-       // Player :: player_calculate_hit_boxes(player);
+       Character :: player_calculate_hit_boxes(player);
 
         FloatRect viewport = game->window.getView().getViewport();
         float left = viewport.left * static_cast<float>(windowSize.x);

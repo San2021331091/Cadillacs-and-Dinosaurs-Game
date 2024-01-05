@@ -1,11 +1,13 @@
 #include "game.h"
 #include "Sprite.h"
 #include "Utils.h"
+#include "Player.h"
+#include "Enemy.h"
 
 game_t* game;
 
 const float PI = 22.0f/7.0;
-void extern handleEvents();
+void handleEvents();
 void game_spawn_enemies();
 void game_draw_debug(RenderWindow &window);
 void game_init_dblBuffer() {
@@ -22,8 +24,6 @@ void game_init_dblBuffer() {
     // Display the contents of the render texture
     dblBuffer.display();
 }
-
-void game_load_resources();
 
 
 bool game_init_window() {
@@ -69,7 +69,7 @@ void game_load_resources() {
     Animation_Handle::sprite_add_animation(game->level_fire, "fire", 0, 3, 0);
     Animation_Handle::sprite_set_animation(game->level_fire, "fire");
 
-    game->img_avatar_player = game_load_image("E:/ClionProjects/Cadillacs and Dinosaurs Game/images/jack.bmp/jack.bmp");
+    game->img_avatar_player = game_load_image("E:/ClionProjects/Cadillacs and Dinosaurs Game/images/jack.bmp");
 
     game->font = Utils::create_font("E:/ClionProjects/Cadillacs and Dinosaurs Game/Font/RobotoCondensed-Italic.ttf", 20);
 
@@ -95,6 +95,136 @@ void game_load_resources() {
     game->fx_smack_y = 0;
 }
 
+void game_start_new() {
+    game->view_x = 0;
+    game->view_x_far = 0;
+    game->enemy_count = 0;
+    game_spawn_enemies();
+    game->state = GAME_STATE_INTRO;
+    //game->state = GAME_STATE_PLAYING;
+}
+
+
+bool game_init() {
+    game = new game_t;
+    fill(game->keyboard_state.begin(), game->keyboard_state.end(), 0);
+
+    if (!game_init_window()) {
+        return false;
+    }
+
+    game_load_resources();
+
+    game->draw_max = 100;
+    game->draw_list = new draw_t[game->draw_max];
+    game->draw_count = 0;
+
+    game->time_text_blink = 0;
+    game->intro_time = 300;
+
+    game->max_z = 70;
+    game->min_z = -70;
+
+    game->view_x = 0.0f;
+    game->view_x_far = 0.0f;
+
+    game->max_view_x = 0;
+
+    game->ground_y = 520;
+    game->gravity = 0.8f;
+
+    game->state = GAME_STATE_MENU;
+    game->player.push_back(*Player::player_new());
+
+    game->enemy_max = 100;
+    game->enemies.resize(game->enemy_max);
+    game->enemy_count = 0;
+
+    game->spawn_trigger = 0;
+
+    return true;
+}
+
+
+
+
+
+void game_spawn_enemies(){
+
+
+    Enemy::enemy_spawn(10, 40, ENEMY_TYPE_FERRIS);
+
+    Enemy::enemy_spawn(800, 80, ENEMY_TYPE_GNEISS);
+
+    Enemy::enemy_spawn(900, -50, ENEMY_TYPE_GNEISS);
+
+    Enemy::enemy_spawn(1000, 80, ENEMY_TYPE_FERRIS);
+
+    Enemy::enemy_spawn(1150, 0, ENEMY_TYPE_GNEISS);
+
+    Enemy::enemy_spawn(1200, 80, ENEMY_TYPE_FERRIS);
+
+    Enemy::enemy_spawn(1350, 0, ENEMY_TYPE_GNEISS);
+
+    Enemy::enemy_spawn(1500, 80, ENEMY_TYPE_FERRIS);
+
+    Enemy::enemy_spawn(1600, 20, ENEMY_TYPE_GNEISS);
+
+    Enemy::enemy_spawn(1700, 30, ENEMY_TYPE_FERRIS);
+
+    Enemy::enemy_spawn(1900, 70, ENEMY_TYPE_GNEISS);
+
+    Enemy::enemy_spawn(2200, 80, ENEMY_TYPE_FERRIS);
+
+    Enemy::enemy_spawn(2500, 20, ENEMY_TYPE_GNEISS);
+
+    Enemy::enemy_spawn(2800, 30, ENEMY_TYPE_FERRIS);
+
+    Enemy::enemy_spawn(3100, 70, ENEMY_TYPE_GNEISS);
+
+    Enemy::enemy_spawn(3550, 0, ENEMY_TYPE_GNEISS);
+
+    Enemy::enemy_spawn(3800, 80, ENEMY_TYPE_FERRIS);
+
+    Enemy::enemy_spawn(3900, 20, ENEMY_TYPE_GNEISS);
+
+    Enemy::enemy_spawn(4300, 30, ENEMY_TYPE_FERRIS);
+
+    Enemy::enemy_spawn(4700, 70, ENEMY_TYPE_GNEISS);
+
+    Enemy::enemy_spawn(5200, 20, ENEMY_TYPE_GNEISS);
+
+    Enemy::enemy_spawn(5300, -50, ENEMY_TYPE_FERRIS);
+
+    Enemy::enemy_spawn(6500, -20, ENEMY_TYPE_GNEISS);
+
+    Enemy::enemy_spawn(7000, 30, ENEMY_TYPE_FERRIS);
+
+    Enemy::enemy_spawn(8500, 40, ENEMY_TYPE_BUTCHER);
+
+}
+
+void game_cleanup_enemies() {
+    for(int i = 0;i < game->enemy_count;i++) {
+
+        enemy_t* enemy = &game->enemies[i];
+        Enemy::enemy_cleanup(enemy);
+    }
+    game->enemy_count = 0;
+}
+
+
+
+void game_delete() {
+    vector<player_t>*pl = &game->player;
+    for (auto &player: *pl) {
+
+        if (game != nullptr) {
+            game_cleanup_enemies();
+            Player::player_delete(&player);
+        }
+    }
+}
 
 
 
@@ -102,16 +232,16 @@ int main() {
     RenderWindow window(VideoMode(1400, 700), "Cadillacs and Dinosaurs Game", Style::Close | Style::Titlebar);
 
     Image backgroundImage;
-    if (backgroundImage.loadFromFile("E:/ClionProjects/Cadillacs and Dinosaurs Game/images/ss.png")) {
+    if (backgroundImage.loadFromFile("E:/ClionProjects/Cadillacs and Dinosaurs Game/images/bg1.bmp")) {
         Texture backgroundTexture, characterTexture;
         backgroundTexture.loadFromImage(backgroundImage);
 
         // Load different images for player movement
         Texture playerTexture1, playerTexture2;
-        playerTexture1.loadFromFile("E:/ClionProjects/Cadillacs and Dinosaurs Game/images/jack.png");
+        playerTexture1.loadFromFile("E:/ClionProjects/Cadillacs and Dinosaurs Game/images/jack.bmp");
 
         // Use a PNG image with a transparent background
-        playerTexture2.loadFromFile("E:/ClionProjects/Cadillacs and Dinosaurs Game/images/player-jack.png");
+        playerTexture2.loadFromFile("E:/ClionProjects/Cadillacs and Dinosaurs Game/images/jack.bmp");
 
         Sprite backgroundSprite(backgroundTexture), characterSprite(playerTexture1);
 
