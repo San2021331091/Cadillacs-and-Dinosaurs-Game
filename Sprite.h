@@ -6,7 +6,7 @@
 class Sprite_Handle{
 
 public:
-    static initializer_list<sprite_t> sprite_new(const string& filename, int width, int height, float scale);
+    static sprite_t * sprite_new(const string& filename, int width, int height, float scale);
     static void sprite_delete(sprite_t* sprite);
     static void sprite_update( vector<sprite_t>&sprite, float dt);
     static void sprite_draw(vector<sprite_t>& sprites,vector3d_t *pos,int direction);

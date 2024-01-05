@@ -5,7 +5,7 @@
 player_t * Player :: player_new() {
 
     auto player = make_unique<player_t>();
-    player->sprite = Sprite_Handle::sprite_new("E:/ClionProjects/Cadillacs and Dinosaurs Game/images/player-jack.png", 120, 110, 1.2);
+    player->sprite.push_back(*Sprite_Handle::sprite_new("E:/ClionProjects/Cadillacs and Dinosaurs Game/images/player-jack.png", 120, 110, 1.2));
     player->hit_recover_time = 0.0f;
     player->movement_speed = 2.7;
     player->score = 0;

@@ -215,9 +215,9 @@ public:
     vector<player_t>player;
     vector<enemy_t>enemies;
     int enemy_max,enemy_count;
-    Texture img_bg,img_bg_far,img_avatar_player,img_text;
-    vector<Texture> img_level_layers;  //using vector class provided by STL
-    vector<sprite_t>level_fire;
+    Image img_bg,img_bg_far,img_avatar_player,img_text;
+    Image * img_level_layers;
+    vector<sprite_t> level_fire;
     float fx_smack_x,fx_smack_y,fx_smack_time;
     draw_t *draw_list;
     int draw_max;

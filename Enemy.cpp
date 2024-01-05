@@ -64,7 +64,7 @@ enemy_t * Enemy ::enemy_spawn(int x, int z, int type) {
         switch (type) {
 
             case ENEMY_TYPE_FERRIS:
-                enemy->sprite = Sprite_Handle :: sprite_new("E:/ClionProjects/Cadillacs and Dinosaurs Game/images/enemy-1.bmp", 120, 90, 2.5);
+                enemy->sprite.push_back(*Sprite_Handle :: sprite_new("E:/ClionProjects/Cadillacs and Dinosaurs Game/images/enemy-1.bmp", 120, 90, 2.5));
                 enemy->name="Ferris & Driver";
                 a = Animation_Handle::sprite_add_animation(enemy->sprite, "run", 6, 11, 0);
                 a->speed = 0.9f;
@@ -81,7 +81,7 @@ enemy_t * Enemy ::enemy_spawn(int x, int z, int type) {
                 break;
 
             case ENEMY_TYPE_GNEISS:
-                enemy->sprite = Sprite_Handle :: sprite_new("E:/ClionProjects/Cadillacs and Dinosaurs Game/images/enemy-2.bmp", 120, 90, 2.5);
+                enemy->sprite.push_back(*Sprite_Handle :: sprite_new("E:/ClionProjects/Cadillacs and Dinosaurs Game/images/enemy-2.bmp", 120, 90, 2.5));
                 enemy->name="Gneiss";
                 a = Animation_Handle::sprite_add_animation(enemy->sprite, "run", 6, 11, 0);
                 a->speed = 0.9f;
@@ -98,7 +98,7 @@ enemy_t * Enemy ::enemy_spawn(int x, int z, int type) {
 
 
             case ENEMY_TYPE_BUTCHER:
-                enemy->sprite = Sprite_Handle::sprite_new("E:/ClionProjects/Cadillacs and Dinosaurs Game/images/enemy-butcher.bmp", 200, 130, 2.3);
+                enemy->sprite.push_back(*Sprite_Handle::sprite_new("E:/ClionProjects/Cadillacs and Dinosaurs Game/images/enemy-butcher.bmp", 200, 130, 2.3));
                 enemy->frames_per_row = 3;
                 enemy->name = "Butcher";
                 enemy->damage_takes = 2.0f;

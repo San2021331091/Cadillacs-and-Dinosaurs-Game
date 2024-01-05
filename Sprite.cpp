@@ -1,7 +1,6 @@
 #include "Sprite.h"
 
-
-initializer_list<sprite_t> Sprite_Handle::sprite_new(const string& filename, int width, int height, float scale) {
+sprite_t* Sprite_Handle::sprite_new(const string& filename, int width, int height, float scale) {
     auto* s = new sprite_t;
 
     s->image.loadFromFile(filename);
@@ -26,8 +25,9 @@ initializer_list<sprite_t> Sprite_Handle::sprite_new(const string& filename, int
     s->animation_count = 0;
     s->animation_current = 0;
 
-    return reinterpret_cast<const initializer_list<sprite_t> &>(s);
+    return s;
 }
+
 
 void Sprite_Handle :: sprite_delete(sprite_t* sprite) {
     sprite->animations.clear();
