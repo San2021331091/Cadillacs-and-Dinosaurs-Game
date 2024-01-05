@@ -377,7 +377,7 @@ void game_draw(RenderWindow &window,FloatRect rect){
             struct character_t* ch = enemy;
             if (ch->health > 0 && (enemy->engaging == 1 || ch->state == CHARACTER_STATE_HIT)) {
                 vector3d_t center{};
-                character_get_center(ch, &center);
+               // character_get_center(ch, &center);
                 int width = 70;
                 int height = 8;
                 float x = (-game->view_x) + center.x - ((float)(width)/2);
@@ -549,6 +549,200 @@ void enemy_remove(int index) {
     }
     game->enemy_count--;
 }
+
+void effect_update(effect_t* fx, float dt) {
+   Sprite_Handle:: sprite_update(fx->sprite, dt);
+
+    struct animation_t* anim = fx->anim;
+    if (anim->animation_ended) {
+        fx->draw_punch = 0;
+    }
+}
+
+void game_update_enemies(float dt) {
+    int idx_remove = -1;
+
+    for(int i = 0;i < game->enemy_count;i++) {
+        enemy_t* enemy = &game->enemies[i];
+        if (enemy->marked_for_delete) {
+            idx_remove = i;
+        } else {
+            Enemy::enemy_update(enemy,i, dt);
+        }
+    }
+    if (idx_remove != -1) {
+        enemy_remove(idx_remove);
+    }
+}
+
+void game_trigger_spawn_enemies(float dt) {
+    float x = game->draw_list->x;
+    enemy_t* e;
+    if (game->spawn_trigger == 0) {
+        if (x > 1000) {
+            game->spawn_trigger++;
+
+            e = Enemy::enemy_spawn((int)game->view_x - 100, -50, ENEMY_TYPE_FERRIS);
+            e->state = CHARACTER_STATE_RUNNING;
+
+            e = Enemy::enemy_spawn((int)game->view_x - 200, 0, ENEMY_TYPE_FERRIS);
+            e->state = CHARACTER_STATE_RUNNING;
+        }
+    } else if (game->spawn_trigger == 1) {
+        if (x > 2000) {
+            game->spawn_trigger++;
+
+            e = Enemy::enemy_spawn((int)(game->view_x + game->rect_width), 0, ENEMY_TYPE_GNEISS);
+            e->state = CHARACTER_STATE_RUNNING;
+
+            e = Enemy::enemy_spawn((int)game->view_x - 100, 50, ENEMY_TYPE_FERRIS);
+            e->state = CHARACTER_STATE_RUNNING;
+        }
+    } else if (game->spawn_trigger == 2) {
+        if (x > 4000) {
+            game->spawn_trigger++;
+
+            e = Enemy::enemy_spawn((int)(game->view_x + game->rect_width), 0, ENEMY_TYPE_GNEISS);
+            e->state = CHARACTER_STATE_RUNNING;
+
+            e = Enemy::enemy_spawn((int)(game->view_x - 100), 50, ENEMY_TYPE_FERRIS);
+            e->state = CHARACTER_STATE_RUNNING;
+        }
+    } else if (game->spawn_trigger == 3) {
+        if (x > 5000) {
+            game->spawn_trigger++;
+
+            e = Enemy::enemy_spawn((int)(game->view_x + game->rect_width), 50, ENEMY_TYPE_GNEISS);
+            e->state = CHARACTER_STATE_RUNNING;
+
+            e = Enemy:: enemy_spawn((int)(game->view_x - 100), -50, ENEMY_TYPE_FERRIS);
+            e->state = CHARACTER_STATE_RUNNING;
+        }
+    } else if (game->spawn_trigger == 4) {
+        if (x > 6000) {
+            game->spawn_trigger++;
+
+            e = Enemy::enemy_spawn((int)(game->view_x + game->rect_width), 50, ENEMY_TYPE_GNEISS);
+            e->state = CHARACTER_STATE_RUNNING;
+
+            e = Enemy::enemy_spawn((int)(game->view_x - 100), -50, ENEMY_TYPE_GNEISS);
+            e->state = CHARACTER_STATE_RUNNING;
+        }
+    } else if (game->spawn_trigger == 5) {
+        if (x > 7000) {
+            game->spawn_trigger++;
+
+            e = Enemy::enemy_spawn((int)(game->view_x - 100), -50, ENEMY_TYPE_FERRIS);
+            e->state = CHARACTER_STATE_RUNNING;
+
+            e = Enemy::enemy_spawn((int)(game->view_x - 200), 0, ENEMY_TYPE_FERRIS);
+            e->state = CHARACTER_STATE_RUNNING;
+        }
+    }
+}
+
+void game_update(float dt) {
+    const int state = game->state;
+
+    if (state == GAME_STATE_PLAYING) {
+
+       Sprite_Handle:: sprite_update(game->level_fire, dt);
+
+        Player::player_update(&game->player, dt);
+
+        game_update_enemies(dt);
+
+        effect_update(&game->fx_punch, dt);
+        effect_update(&game->fx_blood, dt);
+
+        if (game->fx_smack_time > 0) {
+            game->fx_smack_time -= dt;
+        }
+
+        game_trigger_spawn_enemies(dt);
+
+    } else if (state == GAME_STATE_INTRO) {
+        if (game->time_text_blink > 100) {
+            game->time_text_blink = 0;
+        }
+        game->time_text_blink += (float)(dt * 3.5);
+    } else {
+        if (game->time_text_blink > 100) {
+            game->time_text_blink = 0;
+        }
+        game->time_text_blink += dt;
+    }
+
+    if (state == GAME_STATE_WIN) {
+       Sprite_Handle::sprite_update(game->level_fire, dt);
+       Player::player_update(&game->player, dt);
+    } else if (state == GAME_STATE_INTRO) {
+
+        Player::player_update(&game->player, dt);
+        game_update_enemies(dt);
+
+        if (game->intro_time > 0) {
+            game->intro_time -= dt;
+        } else {
+            game->state = GAME_STATE_PLAYING;
+        }
+
+    } else if (state == GAME_STATE_MENU) {
+        game->view_x += (float)1.1 * dt;
+        game->view_x_far = game->view_x * 0.6f;
+
+        if (game->view_x >= game->max_view_x) {
+            game->view_x = 0;
+        }
+    }
+}
+
+
+
+void game_check_input() {
+
+    player_t *player;
+
+    if (game->state == GAME_STATE_PLAYING) {
+        if (Keyboard::isKeyPressed(Keyboard::Left) || Keyboard ::isKeyPressed(Keyboard::A)) {
+            if (player->health > 0) {
+                player->velocity.x = -player->movement_speed;
+                if (player->on_ground)
+                    Player::player_set_state(player, CHARACTER_STATE_WALKING);
+            }
+        } else if (Keyboard::isKeyPressed(Keyboard::Right)|| Keyboard::isKeyPressed(Keyboard::D)) {
+            if (player->health > 0) {
+                player->velocity.x = player->movement_speed;
+                if (player->on_ground)
+                    Player::player_set_state(player, CHARACTER_STATE_WALKING);
+            }
+        } else {
+            player->velocity.x = 0;
+        }
+
+        if (Keyboard::isKeyPressed(Keyboard::Up)) {
+            if (player->health > 0) {
+                player->velocity.z = -player->movement_speed;
+                if (player->on_ground)
+                    Player::player_set_state(player, CHARACTER_STATE_WALKING);
+            }
+        } else if (Keyboard::isKeyPressed(Keyboard::Down)) {
+            if (player->health > 0) {
+                player->velocity.z = player->movement_speed;
+                if (player->on_ground)
+                    Player::player_set_state(player, CHARACTER_STATE_WALKING);
+            }
+        } else {
+            player->velocity.z = 0;
+        }
+    }
+}
+
+
+
+
+
+
 
 
 int main() {

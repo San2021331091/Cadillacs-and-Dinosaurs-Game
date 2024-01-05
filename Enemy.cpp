@@ -746,7 +746,7 @@ void Enemy ::enemy_do_ai(enemy_t *enemy, float dt) {
 }
 
 
-void Enemy :: enemy_update(enemy_t* enemy, float dt) {
+void Enemy :: enemy_update(enemy_t* enemy,int index, float dt) {
 
     Vector2u windowSize = game->window.getSize();
     FloatRect floatRect;
@@ -756,8 +756,6 @@ void Enemy :: enemy_update(enemy_t* enemy, float dt) {
     floatRect.height = static_cast<float>(windowSize.y);
     character_t* ch = enemy;
     vector<sprite_t> sprite = ch->sprite;
-
-    //vector3d_t old_pos = ch->position;
 
    Sprite_Handle:: sprite_update(sprite, dt);
 

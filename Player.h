@@ -11,7 +11,7 @@ public:
     static void player_delete(player_t* player);
     static void player_draw(vector<player_t>* player);
     static void player_update_state(player_t* player, float dt);
-    static void player_update(player_t* player, float dt);
+    static void player_update(vector<player_t>* pl, float dt);
     static void player_set_state(player_t* player, int state);
 
 

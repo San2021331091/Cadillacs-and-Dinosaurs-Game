@@ -127,6 +127,7 @@ public:
     FloatRect * hit_boxes;
     int hit_box_count;
     int visible;
+    float jump_speed;
 
 };
 

@@ -181,63 +181,67 @@ void Player :: player_update_state(player_t *player, float dt) {
 }
 
 
-void Player::player_update(player_t* player, float dt) {
-    sf::Vector2u windowSize = game->window.getSize();
+void Player::player_update(vector<player_t>* pl, float dt) {
 
-    character_t* ch = player;
+    Vector2u windowSize = game->window.getSize();
 
-    if (ch->velocity.x > 0)
-        ch->direction = CHARACTER_DIRECTION_RIGHT;
-    else if (ch->velocity.x < 0)
-        ch->direction = CHARACTER_DIRECTION_LEFT;
+    for (auto &player: *pl) {
 
-    Sprite_Handle::sprite_update(ch->sprite, dt);
+        character_t *ch = &player;
 
-    Player::player_update_state(player, dt);
+        if (ch->velocity.x > 0)
+            ch->direction = CHARACTER_DIRECTION_RIGHT;
+        else if (ch->velocity.x < 0)
+            ch->direction = CHARACTER_DIRECTION_LEFT;
 
-    if (game->state == GAME_STATE_PLAYING) {
-        vector3d_t old_pos = ch->position;
+        Sprite_Handle::sprite_update(ch->sprite, dt);
 
-        ch->velocity.y += game->gravity * dt;
+        Player::player_update_state(&player, dt);
 
-        ch->position.x += ch->velocity.x * dt;
-        ch->position.y += ch->velocity.y * dt;
-        ch->position.z += ch->velocity.z * dt;
+        if (game->state == GAME_STATE_PLAYING) {
+            vector3d_t old_pos = ch->position;
 
-        if (ch->position.z < game->min_z || ch->position.z > game->max_z) {
-            ch->position.z = old_pos.z;
+            ch->velocity.y += game->gravity * dt;
+
+            ch->position.x += ch->velocity.x * dt;
+            ch->position.y += ch->velocity.y * dt;
+            ch->position.z += ch->velocity.z * dt;
+
+            if (ch->position.z < game->min_z || ch->position.z > game->max_z) {
+                ch->position.z = old_pos.z;
+            }
+
+            if (ch->position.y >= game->ground_y) {
+                ch->position.y = game->ground_y;
+                ch->velocity.y = 0;
+                ch->on_ground = 1;
+            } else {
+                ch->on_ground = 0;
+            }
+
+            Character::player_calculate_hit_boxes(&player);
+
+            FloatRect viewport = game->window.getView().getViewport();
+            float left = viewport.left * static_cast<float>(windowSize.x);
+            float width = viewport.width * static_cast<float>(windowSize.x);
+
+            if (ch->position.x >= left + width / 2) {
+                game->view_x = ch->position.x - width / 2;
+            }
+
+            if (ch->position.x <= left + width / 4) {
+                game->view_x = ch->position.x - width / 4;
+            }
+
+            if (game->view_x > game->max_view_x) {
+                game->view_x = game->max_view_x;
+            }
+
+            if (game->view_x < 0) {
+                game->view_x = 0;
+            }
+
+            game->view_x_far = game->view_x * 0.6f;
         }
-
-        if (ch->position.y >= game->ground_y) {
-            ch->position.y = game->ground_y;
-            ch->velocity.y = 0;
-            ch->on_ground = 1;
-        } else {
-            ch->on_ground = 0;
-        }
-
-       Character :: player_calculate_hit_boxes(player);
-
-        FloatRect viewport = game->window.getView().getViewport();
-        float left = viewport.left * static_cast<float>(windowSize.x);
-        float width = viewport.width * static_cast<float>(windowSize.x);
-
-        if (ch->position.x >= left + width / 2) {
-            game->view_x = ch->position.x - width / 2;
-        }
-
-        if (ch->position.x <= left + width / 4) {
-            game->view_x = ch->position.x - width / 4;
-        }
-
-        if (game->view_x > game->max_view_x) {
-            game->view_x = game->max_view_x;
-        }
-
-        if (game->view_x < 0) {
-            game->view_x = 0;
-        }
-
-        game->view_x_far = game->view_x * 0.6f;
     }
 }
