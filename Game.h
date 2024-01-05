@@ -237,15 +237,6 @@ public:
 
 extern game_t *game;
 
-void graphics_clear();
-void graphics_draw(draw_t * draw);
-void graphics_draw_rect( RenderWindow & window, FloatRect &rect, Color &color);
-void graphics_draw_surface(RenderWindow & window, Image &image, int x, int y, int w, int h,
-                           int src_x, int src_y, int src_w, int src_h, int flip, Color &key);
-void graphics_draw_lifeBar(RenderWindow &window, int x, int y, int height, int width, float life);
-void graphics_swap_buffer(RenderWindow &window,FloatRect &rect);
-
-
 
 #endif
 
