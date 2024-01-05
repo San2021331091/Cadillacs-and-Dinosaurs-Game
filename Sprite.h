@@ -10,7 +10,7 @@ public:
     static void sprite_delete(sprite_t* sprite);
     static void sprite_update( vector<sprite_t>&sprite, float dt);
     static void sprite_draw(vector<sprite_t>& sprites,vector3d_t *pos,int direction);
-    static void sprite_draw_2(sprite_t* sprite, draw_t* draw);
+    static void sprite_draw_2(vector<sprite_t>*sprites, draw_t* draw);
 
 };
 

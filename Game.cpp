@@ -237,9 +237,7 @@ void game_draw_avatar(RenderWindow& window, int x, int y) {
     window.draw(avatarSprite);
 }
 
-#include <SFML/Graphics.hpp>
-
-void game_draw_player_stat(sf::RenderWindow& window, int x) {
+void game_draw_player_statistics(RenderWindow& window, int x) {
     player_t *player;
     Text playerName;
     playerName.setFillColor(Color(255,255,255));
@@ -253,6 +251,65 @@ void game_draw_player_stat(sf::RenderWindow& window, int x) {
     window.draw(playerScore);
 
 }
+
+float level_stretch = 0.4f;
+float org_width = 3664;
+
+void game_draw_level(sf::RenderWindow& window, FloatRect rect) {
+    float level_scaled = (float)1.0 / level_stretch;
+
+    game->max_view_x = org_width * level_scaled - rect.width;
+
+    float stretched_width = rect.width * level_stretch;
+
+    Texture bgFarTexture;
+    if (!bgFarTexture.loadFromImage(game->img_bg_far)) {
+        return;
+    }
+
+    Sprite bgFarSprite(bgFarTexture);
+    bgFarSprite.setScale((float)(level_stretch - 0.3), 0.7);
+    bgFarSprite.setTextureRect(IntRect((int)(game->view_x_far * (level_stretch - 0.3)), 0, (int)stretched_width, 144));
+    window.draw(bgFarSprite);
+
+    Texture bgTexture;
+    if (!bgTexture.loadFromImage(game->img_bg)) {
+       return;
+    }
+
+    Sprite bgSprite(bgTexture);
+    bgSprite.setScale(level_stretch, 1);
+    bgSprite.setTextureRect(IntRect((int)(game->view_x * level_stretch), 0, (int)stretched_width, 224));
+    bgSprite.setColor(Color(255, 174, 201)); // Set the color mask
+    window.draw(bgSprite);
+}
+
+void effect_draw(effect_t* fx) {
+    if (fx->draw_punch) {
+        Sprite_Handle::sprite_draw(fx->sprite, fx, CHARACTER_DIRECTION_RIGHT);
+    }
+}
+
+void game_draw_level_fire(RenderWindow& window, FloatRect &rect) {
+    float level_scaled = 1.0f / level_stretch;
+
+    draw_t draw;
+    Sprite_Handle::sprite_draw_2(&game->level_fire, &draw);
+
+    float scaled_width = (float)draw.width * level_scaled;
+    float gap = rect.width - scaled_width;
+
+    Texture texture;
+    texture.loadFromImage(draw.image);
+    Sprite sprite(texture);
+    sprite.setTextureRect(IntRect(draw.src_x, draw.src_y, draw.src_width, draw.src_height));
+    sprite.setScale(level_stretch, 1.0f);
+    sprite.setPosition((-game->view_x) + game->max_view_x + gap, 0);
+
+    window.draw(sprite);
+}
+
+
 
 
 

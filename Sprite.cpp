@@ -166,22 +166,26 @@ void Sprite_Handle :: sprite_draw(vector<sprite_t>& sprites, vector3d_t* pos, in
 }
 
 
-void Sprite_Handle :: sprite_draw_2(sprite_t* sprite, draw_t* draw) {
-    int width = sprite->width;
-    int height = sprite->height;
+void Sprite_Handle :: sprite_draw_2(vector<sprite_t>*sprites, draw_t* draw) {
 
-    sprite->frame_x = sprite->frame % sprite->frames_per_row;
-    sprite->frame_y = floor(sprite->frame / sprite->frames_per_row);
 
-    draw->flip = 0;
-    draw->image = sprite->image;
-    draw->width = width * (int)sprite->scale;
-    draw->height = height * (int) sprite->scale;
+    for(auto & sprite : *sprites) {
+        int width = sprite.width;
+        int height = sprite.height;
 
-    draw->src_x = (sprite->frame_x * width);
-    draw->src_y = (sprite->frame_y * height);
-    draw->src_width = width;
-    draw->src_height = height;
-    draw->color_mask = sprite->color_mask;
-    draw->draw_top = sprite->draw_top;
+        sprite.frame_x = sprite.frame % sprite.frames_per_row;
+        sprite.frame_y = floor(sprite.frame / sprite.frames_per_row);
+
+        draw->flip = 0;
+        draw->image = sprite.image;
+        draw->width = width * (int) sprite.scale;
+        draw->height = height * (int) sprite.scale;
+
+        draw->src_x = (sprite.frame_x * width);
+        draw->src_y = (sprite.frame_y * height);
+        draw->src_width = width;
+        draw->src_height = height;
+        draw->color_mask = sprite.color_mask;
+        draw->draw_top = sprite.draw_top;
+    }
 }
