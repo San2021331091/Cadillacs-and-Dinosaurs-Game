@@ -226,6 +226,34 @@ void game_delete() {
     }
 }
 
+void game_draw_avatar(RenderWindow& window, int x, int y) {
+    Texture avatarTexture;
+    avatarTexture.loadFromImage(game->img_avatar_player);
+
+    Sprite avatarSprite(avatarTexture);
+    avatarSprite.setPosition(static_cast<float>(x), static_cast<float>(y));
+    avatarSprite.setScale(2.0f, 2.0f); // Adjust the scale as needed
+
+    window.draw(avatarSprite);
+}
+
+#include <SFML/Graphics.hpp>
+
+void game_draw_player_stat(sf::RenderWindow& window, int x) {
+    player_t *player;
+    Text playerName;
+    playerName.setFillColor(Color(255,255,255));
+    playerName.setString("Player Jack");
+    playerName.setPosition((float)x + 60, 20);
+    Text playerScore;
+    playerScore.setFillColor(Color(255,255,0));
+    playerScore.setString("Score: " + to_string(player->score));
+    playerScore.setPosition((float)x + 200, 20);
+    window.draw(playerName);
+    window.draw(playerScore);
+
+}
+
 
 
 int main() {
