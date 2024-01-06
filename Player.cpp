@@ -74,11 +74,11 @@ void Player::player_draw(player_t* player, HDC hdc) {
 }
 
 
-void  Player :: player_set_state(struct player_t* player, int state) {
+void  Player :: player_set_state(player_t* player, int state) {
     character_t* ch = &player->base;
     sprite_t* sprite = ch->sprite;
     if (ch->state == CHARACTER_STATE_FIGHT) {
-        struct animation_t* anim = Animation_Handle:: sprite_current_animation(sprite);
+        animation_t* anim = Animation_Handle:: sprite_current_animation(sprite);
         if (!anim->animation_ended) {
             return;
         }
