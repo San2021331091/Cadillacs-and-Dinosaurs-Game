@@ -74,7 +74,7 @@ upcoming cooperative gameplay.For the second player, the O key is employed to
 browse through character options during the player selection phase. Subsequently,
 the selection is confirmed by using the K key. As for the third player, the E key
 facilitates navigation through character choices, while the I key is designated for
-confirming the selection.
+confirming the selection.Other players are locked by default.
 
 ## Combat Controls:
 In this cooperative gameplay scenario, the control dynamics are designed for Player
