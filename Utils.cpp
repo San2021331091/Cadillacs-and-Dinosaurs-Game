@@ -1,16 +1,14 @@
+
 #include "Utils.h"
 
 
-void Utils ::vector3d_zero(vector3d_t *vec) {
-
+void Utils :: vector3d_zero(struct vector3d_t* vec) {
     vec->x = 0;
     vec->y = 0;
     vec->z = 0;
-
-
 }
 
-int Utils::get_rand(int min, int max) {
+int Utils :: get_rand(int min, int max) {
     random_device rd;
     mt19937 gen(rd());
     uniform_int_distribution<int> distribution(0, max - min);
@@ -18,9 +16,7 @@ int Utils::get_rand(int min, int max) {
     return distribution(gen) + min;
 }
 
-
-float Utils ::get_Random(float a, float b) {
-
+float Utils :: get_RandF(float a, float b) {
     random_device rd;
     mt19937 gen(rd());
     uniform_real_distribution<float> distribution(0.0f, 1.0f);
@@ -30,18 +26,13 @@ float Utils ::get_Random(float a, float b) {
     float r = random * diff;
 
     return a + r;
-
-
-
 }
 
-Font Utils :: create_font(const string& filename, unsigned int size) {
-    Font font;
-    font.loadFromFile(filename);
-    Text text;
-    text.setFont(font);
-    text.setCharacterSize(size);
+HFONT Utils ::  create_font(const wchar_t* name, int size) {
+    HDC hDC = GetDC(HWND_DESKTOP);
+    int hight = -MulDiv(size, GetDeviceCaps(hDC, LOGPIXELSY), 72);
+    ReleaseDC(HWND_DESKTOP, hDC);
+    HFONT font = CreateFontW(hight, 0, 0, 0, FW_BOLD, 0, 0, 0,
+                             DEFAULT_CHARSET, OUT_DEFAULT_PRECIS, CLIP_DEFAULT_PRECIS, DEFAULT_QUALITY, DEFAULT_PITCH, name);
     return font;
-
-
 }
