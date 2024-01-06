@@ -493,7 +493,7 @@ void game_update_enemies(float dt) {
     int idx_remove = -1;
 
     for(int i = 0;i < game->enemy_count;i++) {
-        struct enemy_t* enemy = &game->enemies[i];
+        enemy_t* enemy = &game->enemies[i];
         if (enemy->marked_for_delete) {
             idx_remove = i;
         } else {
@@ -507,7 +507,7 @@ void game_update_enemies(float dt) {
 
 void game_trigger_spawn_enemies(float dt) {
     float x = game->player->base.position.x;
-    struct enemy_t* e;
+    enemy_t* e;
     if (game->spawn_trigger == 0) {
         if (x > 1000) {
             game->spawn_trigger++;
