@@ -817,7 +817,7 @@ void game_run() {
 
     int main() {
         // Create the window
-        RenderWindow window(sf::VideoMode(1400, 560), "Player Selection");
+        RenderWindow window(VideoMode(1400, 560), "Player Selection");
 
         // Load the background image
         Texture backgroundTexture;
@@ -852,8 +852,11 @@ void game_run() {
             return 1;
         }
 
+        // Set the initial border size (no border)
+        float borderSize = 0.0f;
 
-        Text selectionText("Select Player Jack if you want", font, 20);
+
+        Text selectionText("Only Player Jack is currently available", font, 20);
         selectionText.setPosition(50, 400);
 
         while (window.isOpen()) {
@@ -864,12 +867,14 @@ void game_run() {
                 }
 
                 if (event.type == Event::KeyPressed) {
-                    if (event.key.code == sf::Keyboard::G) {
+                    if (event.key.code == Keyboard::G) {
                         selectionText.setString("Player Jack selected!");
+
+                        // Increase the border size when 'G' is pressed
+                        borderSize = 2.0f;
                     }
 
                     if (event.key.code == Keyboard::U) {
-                        selectionText.setString("Confirmation!");
                         window.close();
                         if (game_init()) {
                             game_run();
@@ -884,7 +889,7 @@ void game_run() {
             // Draw the background
             window.draw(backgroundSprite);
 
-            // Draw the images and the button
+            sprite1.setColor(Color(255, 255, 255)); // Reset the color
             window.draw(sprite1);
             window.draw(sprite2);
             window.draw(sprite3);
