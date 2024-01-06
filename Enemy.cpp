@@ -317,7 +317,7 @@ void Enemy :: enemy_do_ai(enemy_t* enemy, float dt) {
         // this enemy won't engage while any other enemy is engaging
         int can_fight = 1;
         for(int i = 0;i < game->enemy_count;i++) {
-            struct enemy_t* another_enemy = &game->enemies[i];
+            enemy_t* another_enemy = &game->enemies[i];
             if (another_enemy != enemy) {
 
                 if (another_enemy->engaging) {
@@ -374,12 +374,12 @@ void Enemy :: enemy_do_ai(enemy_t* enemy, float dt) {
 
         if (player_distance_x < fight_range_x && player_distance_z < fight_range_z) {
             // this enemy won't engage while any other enemy is engaging
-            int can_fight = 1;
+            bool can_fight = true;
             for(int i = 0;i < game->enemy_count;i++) {
-                struct enemy_t* another_enemy = &game->enemies[i];
+                enemy_t* another_enemy = &game->enemies[i];
                 if (another_enemy != enemy) {
                     if (another_enemy->engaging) {
-                        can_fight = 0;
+                        can_fight = false;
                         break;
                     }
                 }
@@ -514,7 +514,7 @@ void Enemy :: enemy_do_ai(enemy_t* enemy, float dt) {
                         ch->state = CHARACTER_STATE_RANGE_ATTACK;
                         ch->state_on_enter = 1;
 
-                        struct enemy_t* e;
+                         enemy_t* e;
 
                         if (ch->health <= 30) {
                             e = enemy_spawn(game->view_x + game->rect_width + 200, 0, ENEMY_TYPE_GNEISS);
@@ -617,14 +617,14 @@ void Enemy :: enemy_do_ai(enemy_t* enemy, float dt) {
 }
 
 
-void Enemy :: enemy_update(struct enemy_t* enemy, int index, float dt) {
+void Enemy :: enemy_update(enemy_t* enemy, int index, float dt) {
     RECT rcClient;
     character_t* ch = &enemy->base;
     sprite_t* sprite = ch->sprite;
 
     GetClientRect(game->hwnd, &rcClient);
 
-    struct vector3d_t old_pos = ch->position;
+    vector3d_t old_pos = ch->position;
 
     Sprite_Handle::sprite_update(sprite, dt);
 
