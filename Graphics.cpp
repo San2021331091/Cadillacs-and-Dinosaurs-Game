@@ -10,7 +10,7 @@ void Graphics :: graphics_draw(draw_t* args) {
     }
 
     draw_t* draw = &game->draw_list[game->draw_count];
-    memcpy(draw, args, sizeof(struct draw_t));
+    memcpy(draw, args, sizeof(draw_t));
     game->draw_count++;
 }
 
@@ -49,8 +49,8 @@ void Graphics ::  graphics_draw_surface(HDC hdc, HBITMAP bitmap, int x, int y, i
 }
 
 int compare_draw(const void* l, const void* r) {
-    const auto* a = (const struct draw_t*)l;
-    const auto* b = (const struct draw_t*)r;
+    const auto* a = (const draw_t*)l;
+    const auto* b = (const draw_t*)r;
     if (a->draw_top )
         return 1;
     else if (b->draw_top )
@@ -64,7 +64,7 @@ int compare_draw(const void* l, const void* r) {
 
 void Graphics :: graphics_swap_buffer(HDC hdc, RECT* rect) {
 
-    qsort(game->draw_list, game->draw_count, sizeof(struct draw_t), compare_draw);
+    qsort(game->draw_list, game->draw_count, sizeof(draw_t), compare_draw);
 
     for(int i = 0;i < game->draw_count;i++) {
         draw_t* draw = &game->draw_list[i];
