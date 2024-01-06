@@ -7,7 +7,7 @@
 void Character::character_get_center(character_t* character, vector3d_t* center) {
     float scaled_width = (float)(character->sprite->width) * character->sprite->scale;
     float scaled_height = (float)(character->sprite->height) * character->sprite->scale;
-    struct vector3d_t* pos = &character->position;
+    vector3d_t* pos = &character->position;
 
     center->x = pos->x + (scaled_width/2);
     center->y = pos->y + (scaled_height/2);
@@ -26,11 +26,11 @@ int rect_collision(RECT* r1, RECT* r2) {
 }
 
 void Character :: enemy_calculate_hit_boxes(enemy_t* enemy) {
-    struct character_t* character = &enemy->base;
+    character_t* character = &enemy->base;
     RECT* box=nullptr;
     int type = enemy->type;
-    struct vector3d_t* pos = &character->position;
-    struct sprite_t* sprite = character->sprite;
+    vector3d_t* pos = &character->position;
+    sprite_t* sprite = character->sprite;
     int state = character->state;
     int direction = character->direction;
 
@@ -360,7 +360,7 @@ void Character::player_calculate_hit_boxes(player_t* player) {
 
         if (player->hit_reset == 0 && sprite->frame == last_frame) {
             for (int i = 0;i < game->enemy_count;i++) {
-                struct enemy_t* enemy = &game->enemies[i];
+                enemy_t* enemy = &game->enemies[i];
                 if (enemy->base.health <= 0 || enemy->base.state == CHARACTER_STATE_HIT_FALL) {
                     continue;
                 }
