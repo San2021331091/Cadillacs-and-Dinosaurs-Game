@@ -121,8 +121,8 @@ ultimate aim is to deliver a high-quality and nostalgic gaming experience for pl
 ---------------------------------------------------------------------------------------------
 SUBMITTED BY:
 
-Santosh Saha
-2021331091
+## Santosh Saha
+## 2021331091
 
-Partha Protim Biswas
-2021331015
+## Partha Protim Biswas
+## 2021331015
