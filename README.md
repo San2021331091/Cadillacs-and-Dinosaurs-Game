@@ -79,18 +79,9 @@ confirming the selection.Other players are locked by default.
 ## Combat Controls:
 In this cooperative gameplay scenario, the control dynamics are designed for Player
 1 to take the reins, manually manoeuvring through the post-apocalyptic world of
-"Cadillacs and Dinosaurs." Player 1 utilises the ‘C’ key /Spacebar for primary attacks, offering strategic control over combat engagements.In tandem, Players 2
-and 3 are configured to automatically engage adversaries, providing consistent
-support to Player 1 without requiring manual input.For defeating dinosaur,’T’ key can
-be utilised.
+"Cadillacs and Dinosaurs." Player 1 utilises the ‘C’ key /Spacebar for primary attacks, offering strategic control over combat engagements.
 Weapon Selection:
-In the game,various weapons complement the players' combat strategies.Weapon
-selection menu can be opened using ‘L’ key.The '1' key equips the rifle, providing
-players with a powerful ranged option for dispatching foes from a distance. Pressing
-the '2' key readies the pistol, offering a versatile firearm for quicker,close-quarters
-engagements. Pressing ‘3’ key for selecting the grenade.‘4’ key and ‘5’ can be
-utilised for throwing bullets using the rifle and pistol respectively. ‘6’ key is used for
-throwing the grenade.
+
 
 ## Pause/Exit Options:
 
