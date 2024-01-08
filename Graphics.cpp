@@ -48,30 +48,34 @@ void Graphics ::  graphics_draw_surface(HDC hdc, HBITMAP bitmap, int x, int y, i
     DeleteDC(hdc_bmp);
 }
 
-int compare_draw(const void* l, const void* r) {
-    const auto* a = (const draw_t*)l;
-    const auto* b = (const draw_t*)r;
-    if (a->draw_top )
-        return 1;
-    else if (b->draw_top )
-        return -1;
-    if ( a->position.z == b->position.z )
-        return 0;
-    else if ( a->position.z < b->position.z )
-        return -1;
-    return 1;
-}
+auto compare_draw = [](const draw_t& a, const draw_t& b) {
+    if (a.draw_top)
+        return true;
+    else if (b.draw_top)
+        return false;
+
+    if (a.position.z == b.position.z)
+        return false;
+    else
+        return a.position.z < b.position.z;
+};
+
 
 void Graphics :: graphics_swap_buffer(HDC hdc, RECT* rect) {
 
-    qsort(game->draw_list, game->draw_count, sizeof(draw_t), compare_draw);
+    vector<draw_t> drawVector(game->draw_list, game->draw_list + game->draw_count);
+
+// Now use sort on the vector
+    sort(drawVector.begin(), drawVector.end(), compare_draw);
+
+// Copy the sorted elements back to the original array if needed
+    copy(drawVector.begin(), drawVector.end(), game->draw_list);
 
     for(int i = 0;i < game->draw_count;i++) {
         draw_t* draw = &game->draw_list[i];
 
         float depth = draw->position.z;
 
-        // to prevent flicker (same z position)
         if (!draw->draw_top) {
             for(int j = 0;j < game->draw_count;j++) {
                 draw_t* jDraw = &game->draw_list[j];
@@ -106,7 +110,7 @@ void Graphics::graphics_draw_lifeBar(HDC hdc, int x, int y, int height, int widt
     int life_bar_x = x;
     int life_bar_width = width;
 
-    int dx_life = life * ((float)life_bar_width / 100.0f);
+    int dx_life = static_cast<int>(life * ((float)life_bar_width / 100.0f));
 
     SelectObject(hdc, pen);
     SelectObject(hdc, brush);
