@@ -8,11 +8,11 @@
 
 game_t* game;
 
-const float PI = 22.0f/7.0;
+
+
 
 static LRESULT CALLBACK main_window_proc(HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam);
 void game_spawn_enemies();
-void game_draw_debug(HDC hdc);
 
 void game_init_dblBuffer() {
     RECT rcClient;
@@ -26,14 +26,14 @@ void game_init_dblBuffer() {
 }
 
 bool game_init_window() {
-    game->height = 800;
-    game->width = 1500;
+    game->height = 900;
+    game->width = 1600;
     game->top_margin = 30;
     game->dbl_buffer = nullptr;
 
     const wchar_t window_class_name[] = L"main_window_class";
 
-    wcscpy(game->title, L"Cadillacs & Dinosaurs");
+    wcscpy(game->title, L"Cadillacs & Dinosaurs Game");
 
     WNDCLASSEXW winCl;
 
@@ -74,6 +74,9 @@ bool game_init_window() {
     ShowWindow(game->hwnd, SW_SHOW);
     return true;
 }
+
+
+
 
 HGDIOBJ game_load_image(const wchar_t* path) {
     return LoadImageW(nullptr, path, IMAGE_BITMAP, 0, 0, LR_LOADFROMFILE);
@@ -271,13 +274,13 @@ float org_width = 3664;
 void game_draw_level(HDC hdc, RECT* rect) {
     HDC hdc_bg = CreateCompatibleDC(hdc);
 
-    float level_scaled = (1.0 / level_stretch);
+    auto level_scaled =(float) (1.0 / level_stretch);
 
     game->max_view_x = (org_width * level_scaled - rect->right);
 
     float stretched_width = (float)rect->right * level_stretch;
 
-    game->rect_width = rect->right;
+    game->rect_width = (float)rect->right;
 
     SelectObject(hdc_bg, game->bmp_bg_far);
 
@@ -325,7 +328,7 @@ void game_draw_level_fire(HDC hdc, RECT* rect) {
     float gap = rect->right - scaled_width;
 
     Graphics::graphics_draw_surface(hdc, draw->hbitmap,
-                          (-game->view_x) + game->max_view_x + gap, 0, scaled_width, rect->bottom,
+                                    (int)((-game->view_x) + game->max_view_x + gap), 0, scaled_width, rect->bottom,
                           draw->src_x, draw->src_y, draw->src_width, draw->src_height,
                           draw->flip, draw->color_mask);
 }
@@ -347,7 +350,7 @@ void game_draw(HDC hdc, RECT* rect) {
         game_draw_level(hdc, rect);
         if (game->time_text_blink < 50 ) {
             swprintf(buf, 256, L"Press Enter to Start");
-            DrawTextW(hdc, buf, wcslen(buf), &rcText, DT_CENTER | DT_VCENTER | DT_SINGLELINE);
+            DrawTextW(hdc, buf, (int)wcslen(buf), &rcText, DT_CENTER | DT_VCENTER | DT_SINGLELINE);
         }
     } else if (state == GAME_STATE_PLAYING ||
                state == GAME_STATE_PAUSED ||
@@ -453,30 +456,13 @@ void game_draw(HDC hdc, RECT* rect) {
     }
 }
 
-
-void game_draw_debug(HDC hdc) {
-    for (int i = 0; i < game->enemy_count; i++) {
-        enemy_t *enemy = &game->enemies[i];
-        character_t *ch = &enemy->base;
-        for (int j = 0; j < ch->hit_box_count; j++) {
-            RECT *box = &ch->hit_boxes[j];
-            Graphics::graphics_draw_rect(hdc, box, RGB(255, 0, 0));
-        }
-    }
-
-    for (int i = 0; i < game->player->base.hit_box_count; i++) {
-        RECT *box = &game->player->base.hit_boxes[i];
-        Graphics::graphics_draw_rect(hdc, box, RGB(0, 255, 0));
-    }
-}
-
-
 void enemy_remove(int index) {
     int count = game->enemy_count - 1;
     for(int i = index; i < count; i++) {
         game->enemies[i] = game->enemies[i + 1];
     }
     game->enemy_count--;
+
 }
 
 void effect_update(effect_t* fx, float dt) {
@@ -633,6 +619,9 @@ void game_exit() {
 }
 
 void game_check_input() {
+
+
+
     if (game->state == GAME_STATE_PLAYING) {
         if (game->keyboard_state[VK_LEFT]||game->keyboard_state['A']) {
             if (game->player->base.health > 0) {
@@ -672,7 +661,12 @@ void game_check_input() {
 
 bool player_can_attack = true;
 
+
+
+
+
 void game_input(int key, int down) {
+
     if (key == VK_ESCAPE) {
         game_exit();
     }
@@ -694,16 +688,24 @@ void game_input(int key, int down) {
                 if (key == VK_SPACE && player_can_attack == 1) {
                     Player::player_set_state(game->player, CHARACTER_STATE_FIGHT);
                     player_can_attack = false;
+
+
+
                 }
                 if (key == VK_CONTROL) {
                     Player::player_set_state(game->player, CHARACTER_STATE_JUMP);
+
                 }
                 if ((key == 'C' || key == 'c') && game->player->base.on_ground) {
 
                     Player::player_set_state(game->player, CHARACTER_STATE_FIGHT);
+
+
                 }
             }
         }
+
+
 
         if (key == 'P' || key == 'p') {
             if (game->state == GAME_STATE_PLAYING)
@@ -748,6 +750,7 @@ LRESULT CALLBACK main_window_proc(HWND hwnd, UINT message, WPARAM wParam, LPARAM
         case WM_ERASEBKGND: {
             return 1;
         }
+
         case WM_PAINT: {
             PAINTSTRUCT ps;
             BeginPaint(hwnd, &ps);
@@ -773,11 +776,7 @@ LRESULT CALLBACK main_window_proc(HWND hwnd, UINT message, WPARAM wParam, LPARAM
             EndPaint(hwnd, &ps);
             break;
         }
-        case WM_SIZE: {
-            RECT rect;
-            GetClientRect(hwnd, &rect);
-            break;
-        }
+
         case WM_DESTROY:
             PostQuitMessage(0);
             break;
@@ -794,20 +793,32 @@ void game_run() {
     double seconds_per_frame;
     QueryPerformanceCounter(&start_counter);
     QueryPerformanceFrequency(&frequency);
+
+
     while (true) {
-        while(PeekMessage(&msg, 0, 0, 0, PM_REMOVE)) {
+        while (PeekMessage(&msg, nullptr, 0, 0, PM_REMOVE)) {
             TranslateMessage(&msg);
             DispatchMessage(&msg);
+
+            if (msg.message == WM_QUIT)
+                return;  // exit the loop if WM_QUIT is received
+
         }
-        if(msg.message == WM_QUIT)
-            break;
+
+
         QueryPerformanceCounter(&end_counter);
 
         seconds_per_frame = (((double)(end_counter.QuadPart -
                                        start_counter.QuadPart) * 100.0f) / (double)frequency.QuadPart);
         start_counter = end_counter;
+
         game_check_input();
         game_update((float)seconds_per_frame);
+
+
+
+
+        // InvalidateRect to trigger window repaint
         InvalidateRect(game->hwnd, nullptr, 1);
     }
 }
@@ -815,16 +826,104 @@ void game_run() {
 
 
 
-    int main() {
-        // Create the window
-        RenderWindow window(VideoMode(1400, 560), "Player Selection");
 
-        // Load the background image
-        Texture backgroundTexture;
-        if (!backgroundTexture.loadFromFile("E:/ClionProjects/Cadillacs_and_Dinosaurs_Game/Images/bg1.png")) {
-            return 1;
+
+
+int main() {
+
+
+    // Create the first window
+    RenderWindow window(VideoMode(1600, 800), "Cadillacs and Dinosaurs Game",Style::Close|Style::Titlebar);
+
+    // Load the background image for the first window
+    Texture backgroundTexture;
+    if (!backgroundTexture.loadFromFile("E:/ClionProjects/Cadillacs_and_Dinosaurs_Game/Images/bg.png")) {
+        return 1;
+    }
+    Sprite backgroundSprite(backgroundTexture);
+
+    // Create a button for the first window
+    Font font;
+    if (!font.loadFromFile("E:/ClionProjects/Cadillacs_and_Dinosaurs_Game/Font/RobotoCondensed-Italic.ttf")) {
+        return 1;
+    }
+bool audioOn = false;
+    Text newGameButton("New Game", font, 30),audioButton("Audio:OFF",font,30);
+    newGameButton.setPosition(700, 300);
+    newGameButton.setFillColor(Color::White);
+    newGameButton.setStyle(Text::Style::Bold);
+    audioButton.setPosition(700, 400);
+    audioButton.setFillColor(Color::White);
+    audioButton.setStyle(Text::Style::Bold);
+    RectangleShape buttonBackground(Vector2f(newGameButton.getGlobalBounds().width + 20, newGameButton.getGlobalBounds().height + 30)),
+            buttonBackground1(Vector2f(audioButton.getGlobalBounds().width + 20, audioButton.getGlobalBounds().height + 30));
+    buttonBackground.setPosition(newGameButton.getPosition().x - 10, newGameButton.getPosition().y - 5);
+    buttonBackground.setFillColor(Color::Blue);
+    buttonBackground1.setPosition(audioButton.getPosition().x - 10, audioButton.getPosition().y - 5);
+    buttonBackground1.setFillColor(Color::Green);
+
+    // Set the positions of the images
+    float scaleFactorX1 = static_cast<float>(window.getSize().x) / (float) backgroundTexture.getSize().x;
+    float scaleFactorY1 = static_cast<float>(window.getSize().y) / (float) backgroundTexture.getSize().y;
+    backgroundSprite.setScale(scaleFactorX1, scaleFactorY1);
+    Event event{};
+    bool winClose = true;
+    Music music, music1;
+    music.openFromFile("E:/ClionProjects/Cadillacs_and_Dinosaurs_Game/sound/gameRun.ogg");
+
+    music1.openFromFile("E:/ClionProjects/Cadillacs_and_Dinosaurs_Game/sound/game1.mp3");
+
+    while (window.isOpen()) {
+        while (window.pollEvent(event)) {
+            if (event.type == Event::Closed) {
+                window.close();
+                winClose = false;
+            }
+
+            if (event.type == Event::MouseButtonReleased) {
+                // Check if the mouse click is inside the new game button
+                if (newGameButton.getGlobalBounds().contains((float)event.mouseButton.x, (float)event.mouseButton.y)) {
+                    window.close();
+                    break;
+                }
+                if (audioButton.getGlobalBounds().contains((float)event.mouseButton.x, (float)event.mouseButton.y)) {
+                    audioOn = !audioOn;
+
+
+                    if (audioOn) {
+                        audioButton.setString("Audio: ON");
+                        music.play();
+                        music1.stop();
+                    } else {
+                        audioButton.setString("Audio: OFF");
+                        music.stop();
+                        music1.stop();
+                    }
+                }
+            }
         }
-        Sprite backgroundSprite(backgroundTexture);
+
+        window.clear();
+        // Draw the background
+        window.draw(backgroundSprite);
+        window.draw(buttonBackground);
+        // Draw the new game button
+        window.draw(newGameButton);
+        window.draw(buttonBackground1);
+        window.draw(audioButton);
+        window.display();
+    }
+
+    if (winClose) {
+        // Create the second window
+        RenderWindow window1(VideoMode(1600, 860), "Player Selection", Style::Close |Style::Titlebar);
+
+        // Load the background image for the second window
+        Image image;
+        image.loadFromFile("E:/ClionProjects/Cadillacs_and_Dinosaurs_Game/Images/bg1.png");
+        Texture backgroundTexture1;
+        backgroundTexture1.loadFromImage(image);
+        Sprite backgroundSprite1(backgroundTexture1);
 
         // Load the four images
         Texture texture1, texture2, texture3, texture4;
@@ -840,42 +939,48 @@ void game_run() {
         Sprite sprite1(texture1), sprite2(texture2), sprite3(texture3), sprite4(texture4);
 
         // Set the positions of the images
-        sprite1.setPosition(150, 50);
-        sprite2.setPosition(350, 50);
-        sprite3.setPosition(550, 50);
-        sprite4.setPosition(750, 50);
+        float scaleFactorX = static_cast<float>(window1.getSize().x) / (float) backgroundTexture1.getSize().x;
+        float scaleFactorY = static_cast<float>(window1.getSize().y) / (float) backgroundTexture1.getSize().y;
+        backgroundSprite1.setScale(scaleFactorX, scaleFactorY);
+
+        // Set the positions of the images with respect to the window1 size
+        sprite1.setPosition(250 * scaleFactorX, 50 * scaleFactorY);
+        sprite2.setPosition(550 * scaleFactorX, 50 * scaleFactorY);
+        sprite3.setPosition(850 * scaleFactorX, 50 * scaleFactorY);
+        sprite4.setPosition(1150 * scaleFactorX, 50 * scaleFactorY);
+
+
+
 
 
         // Create text for the button and selection message
-        Font font;
-        if (!font.loadFromFile("E:/ClionProjects/Cadillacs_and_Dinosaurs_Game/Font/RobotoCondensed-Italic.ttf")) {
-            return 1;
-        }
-
-        // Set the initial border size (no border)
-        float borderSize = 0.0f;
-
-
         Text selectionText("Only Player Jack is currently available", font, 20);
         selectionText.setPosition(50, 400);
+        selectionText.setCharacterSize(40);
+        selectionText.setFillColor(Color(255, 255, 0));
+        selectionText.setStyle(Text::Style::Bold);
+        // Calculate the center position for the text
+        float centerX = static_cast<float>(window1.getSize().x) / 2.0f - selectionText.getLocalBounds().width / 2.0f;
+        float centerY = 400.0f; // Keep the vertical position fixed at 400
 
-        while (window.isOpen()) {
-            Event event{};
-            while (window.pollEvent(event)) {
+        // Set the position of the text
+        selectionText.setPosition(centerX, centerY);
+        String s1 = "Player Jack is selected";
+        while (window1.isOpen()) {
+            while (window1.pollEvent(event)) {
                 if (event.type == Event::Closed) {
-                    window.close();
+                    window1.close();
+
                 }
 
                 if (event.type == Event::KeyPressed) {
                     if (event.key.code == Keyboard::G) {
-                        selectionText.setString("Player Jack selected!");
-
-                        // Increase the border size when 'G' is pressed
-                        borderSize = 2.0f;
+                        selectionText.setString(s1);
                     }
 
                     if (event.key.code == Keyboard::U) {
-                        window.close();
+                        window1.close();
+                        music.stop();
                         if (game_init()) {
                             game_run();
                             game_delete();
@@ -884,27 +989,22 @@ void game_run() {
                 }
             }
 
-            window.clear();
+            if(audioOn)
+                music1.play();
 
+            window1.clear();
             // Draw the background
-            window.draw(backgroundSprite);
-
-            sprite1.setColor(Color(255, 255, 255)); // Reset the color
-            window.draw(sprite1);
-            window.draw(sprite2);
-            window.draw(sprite3);
-            window.draw(sprite4);
-
-
-
+            window1.draw(backgroundSprite1);
+            window1.draw(sprite1);
+            window1.draw(sprite2);
+            window1.draw(sprite3);
+            window1.draw(sprite4);
             // Draw the selection message
-            window.draw(selectionText);
-
-            window.display();
-
-
-
+            window1.draw(selectionText);
+            window1.display();
         }
 
         return 0;
     }
+
+}
