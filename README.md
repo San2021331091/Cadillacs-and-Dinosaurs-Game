@@ -29,10 +29,7 @@ characters(Jack Tenrec, Hannah Dundee, Mustapha Cairo, and Mess
 O'Bradovich),each endowed with unique abilities, to engage in hand-to-hand combat
 against a diverse array of enemies, ranging from thugs to dinosaurs. Navigating
 through various levels, players confront boss fights, employ special moves, and
-collect weapons for both melee and ranged combat.Dinosaurs can be neutral or
-enemies in the game. When neutral they are in green color; when enraged or
-attacking they turn into red colour; when "defeated" they return to green colour and
-stop attacking, thus moving off screen. This game typically supports up to three
+collect weapons for both melee and ranged combat.This game typically supports up to three
 players.The gameplay seamlessly integrates vehicular segments, allowing players to
 hop into Cadillacs for dynamic driving experiences. Cooperative multiplayer adds a
 social dimension, enabling friends to join forces. Power-ups, items, and a points
@@ -80,7 +77,7 @@ confirming the selection.Other players are locked by default.
 In this cooperative gameplay scenario, the control dynamics are designed for Player
 1 to take the reins, manually manoeuvring through the post-apocalyptic world of
 "Cadillacs and Dinosaurs." Player 1 utilises the ‘C’ key /Spacebar for primary attacks, offering strategic control over combat engagements.
-Weapon Selection:
+
 
 
 ## Pause/Exit Options:
