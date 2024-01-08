@@ -51,16 +51,6 @@ arrow serving as the command for jumping.
 ## Secondary Movement Controls:
 Players can opt for W,S, A and D keys, with W designated for jumping, S for
 crouching, and A/D for left/right movement.
-Player Selection Control:
-In the player selection phase, the G key is designated for the first player to navigate
-through available character options. Upon finding their desired character, the first
-player can confirm their selection using the U key. This control setup streamlines the
-process, allowing Player 1 to easily choose and finalise their character for the
-upcoming cooperative gameplay.For the second player, the O key is employed to
-browse through character options during the player selection phase. Subsequently,
-the selection is confirmed by using the K key. As for the third player, the E key
-facilitates navigation through character choices, while the I key is designated for
-confirming the selection.
 
 ## Player Selection Control:
 In the player selection phase, the G key is designated for the first player to navigate
