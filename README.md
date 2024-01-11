@@ -1,6 +1,6 @@
-<center>
+
 ![Cadillacs and Dinosaurs Game](https://play-lh.googleusercontent.com/aM5Pc5NSN9A3y-2QhHk7L2qMeiHGDzXa57CewUXJbolc-DHa6hJBYr0ANEdGmAsxqCQ)
-</center>
+
 
 
 
