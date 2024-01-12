@@ -56,7 +56,7 @@ bool game_init_window() {
                 0,
                 window_class_name,
                 game->title,
-                WS_VISIBLE | WS_OVERLAPPED,
+                WS_OVERLAPPED | WS_SYSMENU | WS_MINIMIZEBOX,
                 CW_USEDEFAULT,
                 CW_USEDEFAULT,
                 game->width,
@@ -65,11 +65,16 @@ bool game_init_window() {
                 nullptr,
                 winCl.hInstance,
                 nullptr);
-    } else {
+    }
+
+
+    else {
         return false;
     }
 
     game_init_dblBuffer();
+
+
 
     ShowWindow(game->hwnd, SW_SHOW);
     return true;
@@ -85,6 +90,7 @@ HGDIOBJ game_load_image(const wchar_t* path) {
 
 void game_load_resources() {
     game->bmp_bg = game_load_image(L"E:/ClionProjects/Cadillacs_and_Dinosaurs_Game/Images/ep-5.bmp");
+    game->bmp_bg1 = game_load_image(L"E:/ClionProjects/Cadillacs_and_Dinosaurs_Game/Images/ep-1_01.bmp");
     game->bmp_bg_far = game_load_image(L"E:/ClionProjects/Cadillacs_and_Dinosaurs_Game/Images/ep-5-far.bmp");
     game->bmp_level_layers.reserve(10);
     game->bmp_level_layers[0] = game_load_image(L"E:/ClionProjects/Cadillacs_and_Dinosaurs_Game/Images/ep-5-layer.bmp");
@@ -736,20 +742,20 @@ void game_input(int key, int down) {
 }
 
 
-
 LRESULT CALLBACK main_window_proc(HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam) {
+    static POINTS lastMousePos;
+
     switch (message) {
-        case WM_KEYDOWN: {
-            game_input((signed int)wParam, 1);
+        case WM_KEYDOWN:
+            game_input(static_cast<signed int>(wParam), 1);
             break;
-        }
-        case WM_KEYUP: {
-            game_input((signed int)wParam, 0);
+
+        case WM_KEYUP:
+            game_input(static_cast<signed int>(wParam), 0);
             break;
-        }
-        case WM_ERASEBKGND: {
+
+        case WM_ERASEBKGND:
             return 1;
-        }
 
         case WM_PAINT: {
             PAINTSTRUCT ps;
@@ -764,27 +770,50 @@ LRESULT CALLBACK main_window_proc(HWND hwnd, UINT message, WPARAM wParam, LPARAM
             HBRUSH page_bgk_brush = CreateSolidBrush(RGB(127, 184, 145));
             FillRect(hdcBuffer, &rcClient, page_bgk_brush);
 
-            //SetStretchBltMode(hdcBuffer, HALFTONE);
+            // SetStretchBltMode(hdcBuffer, HALFTONE);
 
             game_draw(hdcBuffer, &rcClient);
 
-            BitBlt(hdc, 0,0, rcClient.right, rcClient.bottom, hdcBuffer, 0,0, SRCCOPY);
+            BitBlt(hdc, 0, 0, rcClient.right, rcClient.bottom, hdcBuffer, 0, 0, SRCCOPY);
 
             DeleteDC(hdcBuffer);
-
             DeleteObject(page_bgk_brush);
             EndPaint(hwnd, &ps);
             break;
         }
 
+        case WM_LBUTTONDOWN:
+            // Save the initial mouse position when left mouse button is pressed
+            lastMousePos = MAKEPOINTS(lParam);
+            SetCapture(hwnd);  // Capture mouse input
+            break;
+
+        case WM_LBUTTONUP:
+            ReleaseCapture();  // Release mouse input capture
+            break;
+
+        case WM_MOUSEMOVE:
+            // Move the window based on the difference in mouse position
+            if (wParam & MK_LBUTTON) {
+                POINTS currentMousePos = MAKEPOINTS(lParam);
+                int deltaX = currentMousePos.x - lastMousePos.x;
+                int deltaY = currentMousePos.y - lastMousePos.y;
+                SetWindowPos(hwnd, nullptr, 0, 0, 0, 0, SWP_NOMOVE | SWP_NOZORDER);
+                SetWindowPos(hwnd, nullptr, deltaX, deltaY, 0, 0, SWP_NOSIZE | SWP_NOZORDER);
+                lastMousePos = currentMousePos;
+            }
+            break;
+
         case WM_DESTROY:
             PostQuitMessage(0);
             break;
+
         default:
             return DefWindowProcW(hwnd, message, wParam, lParam);
     }
     return 0;
 }
+
 
 
 void game_run() {
@@ -944,10 +973,10 @@ bool audioOn = false;
         backgroundSprite1.setScale(scaleFactorX, scaleFactorY);
 
         // Set the positions of the images with respect to the window1 size
-        sprite1.setPosition(250 * scaleFactorX, 50 * scaleFactorY);
-        sprite2.setPosition(550 * scaleFactorX, 50 * scaleFactorY);
-        sprite3.setPosition(850 * scaleFactorX, 50 * scaleFactorY);
-        sprite4.setPosition(1150 * scaleFactorX, 50 * scaleFactorY);
+        sprite1.setPosition(150 * scaleFactorX, 50 * scaleFactorY);
+        sprite2.setPosition(250 * scaleFactorX, 50 * scaleFactorY);
+        sprite3.setPosition(350 * scaleFactorX, 50 * scaleFactorY);
+        sprite4.setPosition(450 * scaleFactorX, 50 * scaleFactorY);
 
 
 
@@ -966,6 +995,8 @@ bool audioOn = false;
         // Set the position of the text
         selectionText.setPosition(centerX, centerY);
         String s1 = "Player Jack is selected";
+        bool isGKeyPressed = false;
+
         while (window1.isOpen()) {
             while (window1.pollEvent(event)) {
                 if (event.type == Event::Closed) {
@@ -976,9 +1007,11 @@ bool audioOn = false;
                 if (event.type == Event::KeyPressed) {
                     if (event.key.code == Keyboard::G) {
                         selectionText.setString(s1);
+                        sprite1.setColor(Color(0,0,255));
+                        isGKeyPressed = true;
                     }
 
-                    if (event.key.code == Keyboard::U) {
+                    if (isGKeyPressed && event.key.code == Keyboard::U) {
                         window1.close();
                         music.stop();
                         if (game_init()) {
