@@ -22,7 +22,6 @@ set(SFML_DIR E:/SFML/lib/cmake/SFML)
 find_package(SFML COMPONENTS system window graphics audio network REQUIRED)
 
 include_directories(E:/SFML/include)
-# Link msimg32 library and sfml library
 
 target_link_libraries(Cadillacs_and_Dinosaurs_Game PRIVATE msimg32 sfml-system sfml-window sfml-graphics sfml-audio)
 # Set compiler options for C++23
