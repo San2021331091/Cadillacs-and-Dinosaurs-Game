@@ -691,7 +691,7 @@ void game_input(int key, int down) {
 
         if (game->state == GAME_STATE_PLAYING) {
             if (game->player->base.health > 0) {
-                if (key == VK_SPACE && player_can_attack == 1) {
+                if (key == VK_SPACE && player_can_attack) {
                     Player::player_set_state(game->player, CHARACTER_STATE_FIGHT);
                     player_can_attack = false;
 
@@ -902,6 +902,9 @@ bool audioOn = false;
 
     music1.openFromFile("E:/ClionProjects/Cadillacs_and_Dinosaurs_Game/sound/game1.mp3");
 
+    music.setLoop(true);
+    music1.setLoop(true);
+
     while (window.isOpen()) {
         while (window.pollEvent(event)) {
             if (event.type == Event::Closed) {
@@ -954,6 +957,7 @@ bool audioOn = false;
         backgroundTexture1.loadFromImage(image);
         Sprite backgroundSprite1(backgroundTexture1);
 
+
         // Load the four images
         Texture texture1, texture2, texture3, texture4;
         if (!texture1.loadFromFile("E:/ClionProjects/Cadillacs_and_Dinosaurs_Game/Images/image1.png") ||
@@ -986,17 +990,24 @@ bool audioOn = false;
         Text selectionText("Only Player Jack is currently available", font, 20);
         selectionText.setPosition(50, 400);
         selectionText.setCharacterSize(40);
-        selectionText.setFillColor(Color(255, 255, 0));
+        selectionText.setFillColor(Color(255, 0, 0));
         selectionText.setStyle(Text::Style::Bold);
         // Calculate the center position for the text
         float centerX = static_cast<float>(window1.getSize().x) / 2.0f - selectionText.getLocalBounds().width / 2.0f;
         float centerY = 400.0f; // Keep the vertical position fixed at 400
+        Clock clock;
+        float scrollSpeed = 100.0f; // Duration for one animation cycle in seconds
+        float returnSpeed = 50.0f; // Adjust the return speed as needed
+        bool isReturning = false;
 
         // Set the position of the text
         selectionText.setPosition(centerX, centerY);
         String s1 = "Player Jack is selected";
         bool isGKeyPressed = false;
-
+        SoundBuffer buffer;
+        buffer.loadFromFile("E:/ClionProjects/Cadillacs_and_Dinosaurs_Game/sound/start.wav");
+        Sound sound;
+        sound.setBuffer(buffer);
         while (window1.isOpen()) {
             while (window1.pollEvent(event)) {
                 if (event.type == Event::Closed) {
@@ -1009,14 +1020,19 @@ bool audioOn = false;
                         selectionText.setString(s1);
                         sprite1.setColor(Color(0,0,255));
                         isGKeyPressed = true;
+                        if(audioOn)
+                            sound.play();
+
                     }
 
                     if (isGKeyPressed && event.key.code == Keyboard::U) {
                         window1.close();
                         music.stop();
+
                         if (game_init()) {
-                            game_run();
-                            game_delete();
+
+                             game_run();
+                             game_delete();
                         }
                     }
                 }
@@ -1024,6 +1040,31 @@ bool audioOn = false;
 
             if(audioOn)
                 music1.play();
+
+
+
+            float timeElapsed = clock.restart().asSeconds();
+            if (!isReturning) {
+                // Scroll from right to left
+                float offsetX = scrollSpeed * timeElapsed;
+                selectionText.move(-offsetX, 0);
+
+                // Check if the text has moved entirely off the window
+                if (selectionText.getPosition().x + selectionText.getGlobalBounds().width < 0) {
+                    isReturning = true;
+                }
+            } else {
+                // Return to the original position
+                float offsetX = returnSpeed * timeElapsed;
+                selectionText.move(offsetX, 0);
+
+                // Check if the text has returned to the original position
+                if (selectionText.getPosition().x <= (float)window.getSize().x) {
+                    selectionText.setPosition((float)window.getSize().x, 400);
+                    isReturning = false;
+                }
+            }
+
 
             window1.clear();
             // Draw the background
