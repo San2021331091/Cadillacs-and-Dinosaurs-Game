@@ -48,6 +48,9 @@ void Graphics ::  graphics_draw_surface(HDC hdc, HBITMAP bitmap, int x, int y, i
     DeleteDC(hdc_bmp);
 }
 
+
+
+// custom comparison function
 auto compare_draw = [](const draw_t& a, const draw_t& b) {
     if (a.draw_top)
         return true;
@@ -60,16 +63,72 @@ auto compare_draw = [](const draw_t& a, const draw_t& b) {
         return a.position.z < b.position.z;
 };
 
+// Merge function to merge two sorted arrays
+void merge(draw_t* arr, int left, int middle, int right, const function<bool(const draw_t&, const draw_t&)>& compare) {
+    int n1 = middle - left + 1;
+    int n2 = right - middle;
+
+    // Create unique_ptr to manage memory for temporary arrays
+   unique_ptr<draw_t[]> leftArray(new draw_t[n1]);
+   unique_ptr<draw_t[]> rightArray(new draw_t[n2]);
+
+    // Copy data to temporary arrays leftArray[] and rightArray[]
+    for (int i = 0; i < n1; ++i)
+        leftArray[i] = arr[left + i];
+    for (int j = 0; j < n2; ++j)
+        rightArray[j] = arr[middle + 1 + j];
+
+    // Merge the temporary arrays back into arr[left-right]
+    int i = 0, j = 0, k = left;
+    while (i < n1 && j < n2) {
+        if (compare(leftArray[i], rightArray[j])) {
+            arr[k] = leftArray[i];
+            ++i;
+        } else {
+            arr[k] = rightArray[j];
+            ++j;
+        }
+        ++k;
+    }
+
+    // Copy the remaining elements of leftArray[], if there are any
+    while (i < n1) {
+        arr[k] = leftArray[i];
+        ++i;
+        ++k;
+    }
+
+    // Copy the remaining elements of rightArray[], if there are any
+    while (j < n2) {
+        arr[k] = rightArray[j];
+        ++j;
+        ++k;
+    }
+}
+
+
+// Merge sort function
+void mergeSort(draw_t* arr, int left, int right, const function<bool(const draw_t&, const draw_t&)>& compare) {
+    if (left < right) {
+        // Same as (left + right) / 2, but avoids overflow for large left and right
+        int middle = left + (right - left) / 2;
+
+        // Sort first and second halves
+        mergeSort(arr, left, middle, compare);
+        mergeSort(arr, middle + 1, right, compare);
+
+        // Merge the sorted halves
+        merge(arr, left, middle, right, compare);
+    }
+}
+
 
 void Graphics :: graphics_swap_buffer(HDC hdc, RECT* rect) {
 
-    vector<draw_t> drawVector(game->draw_list, game->draw_list + game->draw_count);
+    auto* drawList = new draw_t[game->draw_count];  // dynamically allocated array
 
-// Now use sort on the vector
-    sort(drawVector.begin(), drawVector.end(), compare_draw);
-
-// Copy the sorted elements back to the original array if needed
-    copy(drawVector.begin(), drawVector.end(), game->draw_list);
+    // Use mergeSort to sort the array with the custom comparison function
+    mergeSort(drawList, 0, game->draw_count - 1, compare_draw);
 
     for(int i = 0;i < game->draw_count;i++) {
         draw_t* draw = &game->draw_list[i];
