@@ -5,6 +5,9 @@
 #include <windows.h>
 #include <winuser.h>
 #include<SFML/Graphics.hpp>
+#include <SFML/Audio.hpp>
+
+
 
 using namespace std;
 using namespace sf;
@@ -53,6 +56,7 @@ public:
     int flag;
     int animation_ended;
 };
+
 
 
 class sprite_t {
@@ -130,7 +134,7 @@ public:
     float target_x;
     float target_z;
     float death_blink_time;
-    int type;
+    int type,node;
     float damage_takes;
     float hit_streak;
 };
@@ -201,7 +205,7 @@ public:
     int enemy_max;
     int enemy_count;
 
-    HGDIOBJ bmp_bg;
+    HGDIOBJ bmp_bg,bmp_bg1;
     HGDIOBJ bmp_bg_far;
     vector<HGDIOBJ>bmp_level_layers;
 
