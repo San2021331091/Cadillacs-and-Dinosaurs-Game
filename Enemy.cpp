@@ -3,6 +3,7 @@
 #include "Utils.h"
 #include "Character.h"
 #include "Player.h"
+#include "FileLoad.h"
 
 void Enemy::enemy_cleanup(enemy_t* enemy) {
     free(enemy->base.hit_boxes);
@@ -55,7 +56,7 @@ enemy_t* Enemy::enemy_spawn(int x, int z, int type) {
 
     switch(type) {
         case ENEMY_TYPE_FERRIS:
-            enemy->base.sprite = Sprite_Handle::sprite_new(L"E:/ClionProjects/Cadillacs_and_Dinosaurs_Game/Images/enemy-1.bmp", 120, 90, 2.5);
+            enemy->base.sprite = Sprite_Handle::sprite_new(FileLoad::getImageFile1("enemy-1.bmp"), 120, 90, 2.5);
             wcscpy(enemy->base.name, L"Ferris & Driver");
             a = Animation_Handle::sprite_add_animation(enemy->base.sprite, L"run", 6, 11, 0);
             a->speed = 0.9f;
@@ -69,7 +70,7 @@ enemy_t* Enemy::enemy_spawn(int x, int z, int type) {
             a->play_once = 1;
             break;
         case ENEMY_TYPE_GNEISS:
-            enemy->base.sprite = Sprite_Handle::sprite_new(L"E:/ClionProjects/Cadillacs_and_Dinosaurs_Game/Images/enemy-2.bmp", 120, 90, 2.5);
+            enemy->base.sprite = Sprite_Handle::sprite_new(FileLoad::getImageFile1("enemy-2.bmp"), 120, 90, 2.5);
             wcscpy(enemy->base.name, L"Gneiss");
             a = Animation_Handle::sprite_add_animation(enemy->base.sprite, L"run", 6, 11, 0);
             a->speed = 0.9f;
@@ -83,7 +84,7 @@ enemy_t* Enemy::enemy_spawn(int x, int z, int type) {
             a->play_once = 1;
             break;
         case ENEMY_TYPE_BUTCHER:
-            enemy->base.sprite = Sprite_Handle::sprite_new(L"E:/ClionProjects/Cadillacs_and_Dinosaurs_Game/Images/enemy-butcher.bmp", 200, 130, 2.3);
+            enemy->base.sprite = Sprite_Handle::sprite_new(FileLoad::getImageFile1("enemy-butcher.bmp"), 200, 130, 2.3);
             enemy->base.sprite->frames_per_row = 3;
             wcscpy(enemy->base.name, L"Butcher");
             enemy->damage_takes = 2.0f;
@@ -134,6 +135,7 @@ int game_random(int lower, int upper) {
 }
 
 
+
 void Enemy :: enemy_do_ai(enemy_t* enemy, float dt) {
     player_t* player = game->player;
     character_t* ch = &enemy->base;
@@ -162,11 +164,11 @@ void Enemy :: enemy_do_ai(enemy_t* enemy, float dt) {
 
     if (game->state == GAME_STATE_INTRO) {
         ch->state = CHARACTER_STATE_IDLE;
+
+
+
     }
 
-    // So when enemy is away from player and not being hit, there are two actions
-    // 1. Run towards player to attack
-    // 2. Move around and wait for attack
 
     if (enemy->being_hit) {
         enemy->being_hit = 0;
@@ -175,7 +177,7 @@ void Enemy :: enemy_do_ai(enemy_t* enemy, float dt) {
 
         if (anim == player->anim_upper_cut) {
             // double damage
-            ch->health -= enemy->damage_takes * 2;
+            ch->health -= enemy->damage_takes * 3;
             ch->state = CHARACTER_STATE_HIT_FALL;
             enemy->engaging = 0;
             enemy->hit_recover_time = 50;
@@ -202,7 +204,7 @@ void Enemy :: enemy_do_ai(enemy_t* enemy, float dt) {
 
     const float walk_time_wait = 100;
 
-    // do stuffs based on current state
+    // do stuffs on current state
     if (ch->state == CHARACTER_STATE_IDLE) {
         animation_t* prev = Animation_Handle::sprite_current_animation(ch->sprite);
         animation_t* idle = Animation_Handle::sprite_set_animation(ch->sprite, L"idle");
@@ -624,7 +626,6 @@ void Enemy :: enemy_update(enemy_t* enemy, int index, float dt) {
 
     GetClientRect(game->hwnd, &rcClient);
 
-    vector3d_t old_pos = ch->position;
 
     Sprite_Handle::sprite_update(sprite, dt);
 
