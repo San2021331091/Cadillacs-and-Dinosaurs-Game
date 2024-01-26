@@ -4,11 +4,17 @@
 #include "Character.h"
 #include "Player.h"
 #include "FileLoad.h"
+#include "Queue.h"
+
 
 void Enemy::enemy_cleanup(enemy_t* enemy) {
     free(enemy->base.hit_boxes);
     Sprite_Handle::sprite_delete(enemy->base.sprite);
 }
+
+Queue< const wchar_t *> aiQueue;
+vector<const wchar_t*>v;
+
 
 enemy_t* Enemy::enemy_spawn(int x, int z, int type) {
     if (game->enemy_count >= game->enemy_max) {
@@ -53,33 +59,53 @@ enemy_t* Enemy::enemy_spawn(int x, int z, int type) {
 
     enemy->base.state_on_enter = 1;
     enemy->base.state = CHARACTER_STATE_IDLE;
+    aiQueue.enqueue(L"run");
+    aiQueue.enqueue(L"walk");
+    aiQueue.enqueue(L"punch");
+    aiQueue.enqueue(L"punch_pre");
+    aiQueue.enqueue(L"hit");
+    aiQueue.enqueue(L"fall");
+    aiQueue.enqueue(L"idle");
+    aiQueue.enqueue(L"hit2");
+    aiQueue.enqueue(L"hit3");
+
+    while (!aiQueue.isEmpty()) {
+        try {
+            v.push_back(aiQueue.getFront());
+            aiQueue.dequeue();
+        } catch (const runtime_error& e) {
+            cerr << e.what() << endl;
+
+        }
+    }
+
 
     switch(type) {
         case ENEMY_TYPE_FERRIS:
             enemy->base.sprite = Sprite_Handle::sprite_new(FileLoad::getImageFile1("enemy-1.bmp"), 120, 90, 2.5);
             wcscpy(enemy->base.name, L"Ferris & Driver");
-            a = Animation_Handle::sprite_add_animation(enemy->base.sprite, L"run", 6, 11, 0);
+            a = Animation_Handle::sprite_add_animation(enemy->base.sprite, v[0], 6, 11, 0);
             a->speed = 0.9f;
-            enemy->walk = Animation_Handle::sprite_add_animation(enemy->base.sprite, L"walk", 23, 29, 0);
-            a = Animation_Handle::sprite_add_animation(enemy->base.sprite, L"punch", 12, 14, 1);
+            enemy->walk = Animation_Handle::sprite_add_animation(enemy->base.sprite, v[1], 23, 29, 0);
+            a = Animation_Handle::sprite_add_animation(enemy->base.sprite, v[2], 12, 14, 1);
             a->speed = 1.3f;
-            Animation_Handle::sprite_add_animation(enemy->base.sprite, L"punch_pre", 23, 23, 1);
-            Animation_Handle::sprite_add_animation(enemy->base.sprite, L"hit", 21, 21, 1);
-            a = Animation_Handle::sprite_add_animation(enemy->base.sprite, L"fall", 15, 19, 0);
+            Animation_Handle::sprite_add_animation(enemy->base.sprite, v[3], 23, 23, 1);
+            Animation_Handle::sprite_add_animation(enemy->base.sprite, v[4], 21, 21, 1);
+            a = Animation_Handle::sprite_add_animation(enemy->base.sprite, v[5], 15, 19, 0);
             a->speed = 0.7f;
             a->play_once = 1;
             break;
         case ENEMY_TYPE_GNEISS:
             enemy->base.sprite = Sprite_Handle::sprite_new(FileLoad::getImageFile1("enemy-2.bmp"), 120, 90, 2.5);
             wcscpy(enemy->base.name, L"Gneiss");
-            a = Animation_Handle::sprite_add_animation(enemy->base.sprite, L"run", 6, 11, 0);
+            a = Animation_Handle::sprite_add_animation(enemy->base.sprite, v[0], 6, 11, 0);
             a->speed = 0.9f;
-            enemy->walk = Animation_Handle::sprite_add_animation(enemy->base.sprite, L"walk", 23, 29, 0);
-            a = Animation_Handle::sprite_add_animation(enemy->base.sprite, L"punch", 12, 14, 1);
+            enemy->walk = Animation_Handle::sprite_add_animation(enemy->base.sprite, v[1], 23, 29, 0);
+            a = Animation_Handle::sprite_add_animation(enemy->base.sprite, v[2], 12, 14, 1);
             a->speed = 1.3f;
-            Animation_Handle::sprite_add_animation(enemy->base.sprite, L"punch_pre", 23, 23, 1);
-            Animation_Handle::sprite_add_animation(enemy->base.sprite, L"hit", 21, 21, 1);
-            a = Animation_Handle::sprite_add_animation(enemy->base.sprite, L"fall", 15, 19, 0);
+            Animation_Handle::sprite_add_animation(enemy->base.sprite, v[3], 23, 23, 1);
+            Animation_Handle::sprite_add_animation(enemy->base.sprite, v[4], 21, 21, 1);
+            a = Animation_Handle::sprite_add_animation(enemy->base.sprite, v[5], 15, 19, 0);
             a->speed = 0.7f;
             a->play_once = 1;
             break;
@@ -89,15 +115,14 @@ enemy_t* Enemy::enemy_spawn(int x, int z, int type) {
             wcscpy(enemy->base.name, L"Butcher");
             enemy->damage_takes = 2.0f;
             enemy->movement_speed = 3.2;
-
-            a = Animation_Handle::sprite_add_animation(enemy->base.sprite, L"run", 3, 8, 0);
+            a = Animation_Handle::sprite_add_animation(enemy->base.sprite, v[0], 3, 8, 0);
             a->speed = 0.9f;
-            enemy->walk = Animation_Handle::sprite_add_animation(enemy->base.sprite, L"walk", 3, 8, 0);
-            a = Animation_Handle::sprite_add_animation(enemy->base.sprite, L"punch", 9, 11, 1);
+            enemy->walk = Animation_Handle::sprite_add_animation(enemy->base.sprite, v[1], 3, 8, 0);
+            a = Animation_Handle::sprite_add_animation(enemy->base.sprite, v[2], 9, 11, 1);
             a->speed = 0.9f;
-            Animation_Handle::sprite_add_animation(enemy->base.sprite, L"punch_pre", 0, 0, 1);
-            Animation_Handle::sprite_add_animation(enemy->base.sprite, L"hit", 12, 12, 1);
-            a = Animation_Handle::sprite_add_animation(enemy->base.sprite, L"fall", 12, 14, 0);
+            Animation_Handle::sprite_add_animation(enemy->base.sprite, v[3], 0, 0, 1);
+            Animation_Handle::sprite_add_animation(enemy->base.sprite, v[4], 12, 12, 1);
+            a = Animation_Handle::sprite_add_animation(enemy->base.sprite, v[5], 12, 14, 0);
             a->speed = 0.3f;
             a->play_once = 1;
 
@@ -106,11 +131,11 @@ enemy_t* Enemy::enemy_spawn(int x, int z, int type) {
 
     }
 
-    a = Animation_Handle::sprite_add_animation(enemy->base.sprite, L"idle", 0, 2, 1);
+    a = Animation_Handle::sprite_add_animation(enemy->base.sprite, v[6], 0, 2, 1);
     a->speed = 0.8f;
 
-    Animation_Handle::sprite_add_animation(enemy->base.sprite, L"hit2", 20, 20, 1);
-    Animation_Handle::sprite_add_animation(enemy->base.sprite, L"hit3", 22, 22, 1);
+    Animation_Handle::sprite_add_animation(enemy->base.sprite, v[7], 20, 20, 1);
+    Animation_Handle::sprite_add_animation(enemy->base.sprite, v[8], 22, 22, 1);
 
 
     enemy->walk_target_idx = -1;
@@ -164,9 +189,6 @@ void Enemy :: enemy_do_ai(enemy_t* enemy, float dt) {
 
     if (game->state == GAME_STATE_INTRO) {
         ch->state = CHARACTER_STATE_IDLE;
-
-
-
     }
 
 
@@ -203,11 +225,30 @@ void Enemy :: enemy_do_ai(enemy_t* enemy, float dt) {
     }
 
     const float walk_time_wait = 100;
+    aiQueue.enqueue(L"run");
+    aiQueue.enqueue(L"walk");
+    aiQueue.enqueue(L"punch");
+    aiQueue.enqueue(L"punch_pre");
+    aiQueue.enqueue(L"hit");
+    aiQueue.enqueue(L"fall");
+    aiQueue.enqueue(L"idle");
+
+
+    while (!aiQueue.isEmpty()) {
+        try {
+            v.push_back(aiQueue.getFront());
+            aiQueue.dequeue();
+        } catch (const runtime_error& e) {
+            cerr << e.what() << endl;
+
+        }
+    }
+
 
     // do stuffs on current state
     if (ch->state == CHARACTER_STATE_IDLE) {
         animation_t* prev = Animation_Handle::sprite_current_animation(ch->sprite);
-        animation_t* idle = Animation_Handle::sprite_set_animation(ch->sprite, L"idle");
+        animation_t* idle = Animation_Handle::sprite_set_animation(ch->sprite, v[6]);
         if (prev != idle) {
             ch->sprite->frame = game_random(idle->frame_start, idle->frame_end);
         }
@@ -235,7 +276,7 @@ void Enemy :: enemy_do_ai(enemy_t* enemy, float dt) {
         else if (dir_x < 0)
             ch->direction = CHARACTER_DIRECTION_LEFT;
 
-        Animation_Handle::sprite_set_animation(ch->sprite, L"walk");
+        Animation_Handle::sprite_set_animation(ch->sprite, v[1]);
 
         float target_distance_x = 0;
         float target_distance_z = 0;
@@ -317,13 +358,13 @@ void Enemy :: enemy_do_ai(enemy_t* enemy, float dt) {
         }
 
         // this enemy won't engage while any other enemy is engaging
-        int can_fight = 1;
+        bool can_fight = true;
         for(int i = 0;i < game->enemy_count;i++) {
             enemy_t* another_enemy = &game->enemies[i];
             if (another_enemy != enemy) {
 
                 if (another_enemy->engaging) {
-                    can_fight = 0;
+                    can_fight = false;
                 }
             }
         }
@@ -333,7 +374,7 @@ void Enemy :: enemy_do_ai(enemy_t* enemy, float dt) {
             enemy->time_to_attack = 8;
         }
     } else if (ch->state == CHARACTER_STATE_MOVE) {
-        Animation_Handle::sprite_set_animation(ch->sprite, L"walk");
+        Animation_Handle::sprite_set_animation(ch->sprite, v[1]);
 
         // move/walk to the target position
 
@@ -395,7 +436,7 @@ void Enemy :: enemy_do_ai(enemy_t* enemy, float dt) {
                 enemy->walk_time = walk_time_wait;
             }
         } else {
-            Animation_Handle::sprite_set_animation(ch->sprite, L"run");
+            Animation_Handle::sprite_set_animation(ch->sprite, v[0]);
             float dist_x = sqrtf(dir_x * dir_x);
             if (dist_x > 2.0) {
                 dir_x /= dist_x;
@@ -418,7 +459,7 @@ void Enemy :: enemy_do_ai(enemy_t* enemy, float dt) {
             ch->direction = CHARACTER_DIRECTION_LEFT;
 
     } else if (ch->state == CHARACTER_STATE_PUNCH_PRE) {
-        Animation_Handle::sprite_set_animation(ch->sprite, L"punch_pre");
+        Animation_Handle::sprite_set_animation(ch->sprite, v[3]);
         if (enemy->time_to_attack <= 0) {
             ch->state = CHARACTER_STATE_FIGHT;
         } else {
@@ -427,7 +468,7 @@ void Enemy :: enemy_do_ai(enemy_t* enemy, float dt) {
         ch->velocity.x = 0.0;
         ch->velocity.z = 0.0;
     } else if (ch->state == CHARACTER_STATE_RANGE_ATTACK) {
-        Animation_Handle::sprite_set_animation(ch->sprite, L"idle");
+        Animation_Handle::sprite_set_animation(ch->sprite, v[6]);
 
         float dir_x = player_center.x - enemy_center.x;
 
@@ -457,7 +498,7 @@ void Enemy :: enemy_do_ai(enemy_t* enemy, float dt) {
         }
 
     } else if (ch->state == CHARACTER_STATE_FIGHT) {
-        Animation_Handle::sprite_set_animation(ch->sprite, L"punch");
+        Animation_Handle::sprite_set_animation(ch->sprite, v[2]);
 
         float dir_x = player_center.x - enemy_center.x;
 
@@ -489,7 +530,7 @@ void Enemy :: enemy_do_ai(enemy_t* enemy, float dt) {
         }
 
     } else if (ch->state == CHARACTER_STATE_HIT) {
-        Animation_Handle::sprite_set_animation(ch->sprite, L"hit");
+        Animation_Handle::sprite_set_animation(ch->sprite, v[4]);
         if (enemy->hit_recover_time <= 0) {
             // run for player to attack
             ch->state = CHARACTER_STATE_RUNNING;
@@ -500,7 +541,7 @@ void Enemy :: enemy_do_ai(enemy_t* enemy, float dt) {
         ch->velocity.z = 0.0;
 
     } else if (ch->state == CHARACTER_STATE_HIT_FALL) {
-        Animation_Handle::sprite_set_animation(ch->sprite, L"fall");
+        Animation_Handle::sprite_set_animation(ch->sprite, v[5]);
 
         int last_frame = 19;
 
