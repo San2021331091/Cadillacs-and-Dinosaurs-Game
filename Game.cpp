@@ -5,8 +5,13 @@
 #include "Enemy.h"
 #include "Graphics.h"
 #include "Character.h"
+#include "FileLoad.h"
+#include "Stack.h"
 
 game_t* game;
+
+
+
 
 
 
@@ -37,12 +42,13 @@ bool game_init_window() {
 
     WNDCLASSEXW winCl;
 
-    winCl.hInstance = GetModuleHandleW(0);
+
+
+    winCl.hInstance = GetModuleHandleW(nullptr);
     winCl.lpszClassName = window_class_name;
     winCl.lpfnWndProc = main_window_proc;
     winCl.style = CS_DBLCLKS;
     winCl.cbSize = sizeof (WNDCLASSEX);
-
     winCl.hIcon = LoadIconW(nullptr, (LPCWSTR) IDI_APPLICATION);
     winCl.hIconSm = LoadIconW(nullptr, (LPCWSTR) IDI_APPLICATION);
     winCl.hCursor = LoadCursorW(nullptr, (LPCWSTR) IDC_ARROW);
@@ -89,32 +95,34 @@ HGDIOBJ game_load_image(const wchar_t* path) {
 
 
 void game_load_resources() {
-    game->bmp_bg = game_load_image(L"E:/ClionProjects/Cadillacs_and_Dinosaurs_Game/Images/ep-5.bmp");
-    game->bmp_bg1 = game_load_image(L"E:/ClionProjects/Cadillacs_and_Dinosaurs_Game/Images/ep-1_01.bmp");
-    game->bmp_bg_far = game_load_image(L"E:/ClionProjects/Cadillacs_and_Dinosaurs_Game/Images/ep-5-far.bmp");
+
+
+    game->bmp_bg = game_load_image(FileLoad::getImageFile1("ep-5.bmp"));
+    game->bmp_bg1 = game_load_image(FileLoad::getImageFile1("ep-1_01.bmp"));
+    game->bmp_bg_far = game_load_image(FileLoad::getImageFile1("ep-5-far.bmp"));
     game->bmp_level_layers.reserve(10);
-    game->bmp_level_layers[0] = game_load_image(L"E:/ClionProjects/Cadillacs_and_Dinosaurs_Game/Images/ep-5-layer.bmp");
+    game->bmp_level_layers[0] = game_load_image(FileLoad::getImageFile1("ep-5-layer.bmp"));
 
-    game->bmp_text = game_load_image(L"E:/ClionProjects/Cadillacs_and_Dinosaurs_Game/Images/ep-5.bmp/smack.bmp");
+    game->bmp_text = game_load_image(FileLoad::getImageFile1("smack.bmp"));
 
-    game->level_fire = Sprite_Handle::sprite_new(L"E:/ClionProjects/Cadillacs_and_Dinosaurs_Game/Images/ep-5-animation.bmp", 320, 224, 1.0);
+    game->level_fire = Sprite_Handle::sprite_new(FileLoad::getImageFile1("ep-5-animation.bmp"), 320, 224, 1.0);
 
     game->level_fire->frames_per_row = 4;
     Animation_Handle::sprite_add_animation(game->level_fire, L"fire", 0, 3, 0);
     Animation_Handle::sprite_set_animation(game->level_fire, L"fire");
 
-    game->bmp_avatar_player = game_load_image(L"E:/ClionProjects/Cadillacs_and_Dinosaurs_Game/Images/jack.bmp");
+    game->bmp_avatar_player = game_load_image(FileLoad::getImageFile1("jack.bmp"));
 
     game->font = Utils::create_font(L"Arial", 20);
 
-    game->fx_punch.sprite = Sprite_Handle::sprite_new(L"E:/ClionProjects/Cadillacs_and_Dinosaurs_Game/Images/punch.bmp", 120, 120, 1.4);
+    game->fx_punch.sprite = Sprite_Handle::sprite_new(FileLoad::getImageFile1("punch.bmp"), 120, 120, 1.4);
     game->fx_punch.sprite->frames_per_row = 4;
     game->fx_punch.anim = Animation_Handle::sprite_add_animation(game->fx_punch.sprite, L"punch1", 0, 3, 0);
     game->fx_punch.sprite->draw_top = 1;
     game->fx_punch.draw_punch = 0;
     Utils::vector3d_zero(&game->fx_punch.pos);
 
-    game->fx_blood.sprite = Sprite_Handle::sprite_new(L"E:/ClionProjects/Cadillacs_and_Dinosaurs_Game/Images/blood.bmp", 120, 120, 1.2);
+    game->fx_blood.sprite = Sprite_Handle::sprite_new(FileLoad::getImageFile1("blood.bmp"), 120, 120, 1.2);
     game->fx_blood.sprite->frames_per_row = 4;
     game->fx_blood.anim = Animation_Handle::sprite_add_animation(game->fx_blood.sprite, L"punch1", 0, 6, 0);
     game->fx_blood.anim->speed = 1.5f;
@@ -864,16 +872,24 @@ int main() {
     // Create the first window
     RenderWindow window(VideoMode(1600, 800), "Cadillacs and Dinosaurs Game",Style::Close|Style::Titlebar);
 
+
+    Image icon;
+    icon.loadFromFile(FileLoad::getImageFile("logo.png"));
+
+
+    window.setIcon(icon.getSize().x, icon.getSize().y, icon.getPixelsPtr());
+
+
     // Load the background image for the first window
     Texture backgroundTexture;
-    if (!backgroundTexture.loadFromFile("E:/ClionProjects/Cadillacs_and_Dinosaurs_Game/Images/bg.png")) {
+    if (!backgroundTexture.loadFromFile(FileLoad::getImageFile("bg.png"))) {
         return 1;
     }
     Sprite backgroundSprite(backgroundTexture);
 
     // Create a button for the first window
     Font font;
-    if (!font.loadFromFile("E:/ClionProjects/Cadillacs_and_Dinosaurs_Game/Font/RobotoCondensed-Italic.ttf")) {
+    if (!font.loadFromFile(FileLoad::getFontFile("RobotoCondensed-Italic.ttf"))) {
         return 1;
     }
 bool audioOn = false;
@@ -898,9 +914,8 @@ bool audioOn = false;
     Event event{};
     bool winClose = true;
     Music music, music1;
-    music.openFromFile("E:/ClionProjects/Cadillacs_and_Dinosaurs_Game/sound/gameRun.ogg");
-
-    music1.openFromFile("E:/ClionProjects/Cadillacs_and_Dinosaurs_Game/sound/game1.mp3");
+    music.openFromFile(FileLoad::getAudioFile("gameRun.ogg"));
+    music1.openFromFile(FileLoad::getAudioFile("game1.mp3"));
 
     music.setLoop(true);
     music1.setLoop(true);
@@ -949,42 +964,66 @@ bool audioOn = false;
     if (winClose) {
         // Create the second window
         RenderWindow window1(VideoMode(1600, 860), "Player Selection", Style::Close |Style::Titlebar);
-
+        window1.setIcon(icon.getSize().x, icon.getSize().y, icon.getPixelsPtr());
         // Load the background image for the second window
         Image image;
-        image.loadFromFile("E:/ClionProjects/Cadillacs_and_Dinosaurs_Game/Images/bg1.png");
+        image.loadFromFile(FileLoad::getImageFile("bg1.png"));
         Texture backgroundTexture1;
         backgroundTexture1.loadFromImage(image);
         Sprite backgroundSprite1(backgroundTexture1);
 
+        Stack<string>filePaths;
+        for(int i = 4 ; i>=1 ;i--)
+        {
+            string file("image"),ex(".png");
+            string filePath = (file + to_string(i)) .append(ex);
+            filePaths.push(filePath);
 
-        // Load the four images
-        Texture texture1, texture2, texture3, texture4;
-        if (!texture1.loadFromFile("E:/ClionProjects/Cadillacs_and_Dinosaurs_Game/Images/image1.png") ||
-            !texture2.loadFromFile("E:/ClionProjects/Cadillacs_and_Dinosaurs_Game/Images/image2.png") ||
-            !texture3.loadFromFile("E:/ClionProjects/Cadillacs_and_Dinosaurs_Game/Images/image3.png") ||
-            !texture4.loadFromFile("E:/ClionProjects/Cadillacs_and_Dinosaurs_Game/Images/image4.png")) {
-
-            return 1;
         }
 
-        // Create sprites for each image
-        Sprite sprite1(texture1), sprite2(texture2), sprite3(texture3), sprite4(texture4);
+        // Create vector of textures
+        vector<Texture> ts;
 
-        // Set the positions of the images
+        Texture texture;
+
+        // Load textures and create sprites
+        while (!filePaths.isEmpty()) {
+            string currentFilePath = filePaths.peek();
+            string fullFilePath = FileLoad::getImageFile(currentFilePath);
+
+
+
+            if (texture.loadFromFile(fullFilePath)) {
+                ts.emplace_back(texture);
+
+            } else {
+                cerr << "Failed to load texture from file: " << fullFilePath << std::endl;
+            }
+
+                 filePaths.pop();
+        }
+
+
+    // Set the positions of the bg-images
         float scaleFactorX = static_cast<float>(window1.getSize().x) / (float) backgroundTexture1.getSize().x;
         float scaleFactorY = static_cast<float>(window1.getSize().y) / (float) backgroundTexture1.getSize().y;
         backgroundSprite1.setScale(scaleFactorX, scaleFactorY);
 
-        // Set the positions of the images with respect to the window1 size
-        sprite1.setPosition(150 * scaleFactorX, 50 * scaleFactorY);
-        sprite2.setPosition(250 * scaleFactorX, 50 * scaleFactorY);
-        sprite3.setPosition(350 * scaleFactorX, 50 * scaleFactorY);
-        sprite4.setPosition(450 * scaleFactorX, 50 * scaleFactorY);
+
+        //create vector of sprites
+        vector<Sprite>s;
+        for(auto & t : ts)
+        {
+            Sprite sprite(t);
+            s.emplace_back(sprite);
+        }
 
 
-
-
+        // Set specific positions for each sprite
+        s[0].setPosition(150 * scaleFactorX, 50 * scaleFactorY);
+        s[1].setPosition(250 * scaleFactorX, 50 * scaleFactorY);
+        s[2].setPosition(350 * scaleFactorX, 50 * scaleFactorY);
+        s[3].setPosition(450 * scaleFactorX, 50 * scaleFactorY);
 
         // Create text for the button and selection message
         Text selectionText("Only Player Jack is currently available", font, 20);
@@ -1005,9 +1044,11 @@ bool audioOn = false;
         String s1 = "Player Jack is selected";
         bool isGKeyPressed = false;
         SoundBuffer buffer;
-        buffer.loadFromFile("E:/ClionProjects/Cadillacs_and_Dinosaurs_Game/sound/start.wav");
+        buffer.loadFromFile(FileLoad::getAudioFile("start.wav"));
         Sound sound;
         sound.setBuffer(buffer);
+
+
         while (window1.isOpen()) {
             while (window1.pollEvent(event)) {
                 if (event.type == Event::Closed) {
@@ -1018,7 +1059,7 @@ bool audioOn = false;
                 if (event.type == Event::KeyPressed) {
                     if (event.key.code == Keyboard::G) {
                         selectionText.setString(s1);
-                        sprite1.setColor(Color(0,0,255));
+                        s[0].setColor(Color(0,0,255));
                         isGKeyPressed = true;
                         if(audioOn)
                             sound.play();
@@ -1034,7 +1075,11 @@ bool audioOn = false;
                              game_run();
                              game_delete();
                         }
+
+
+
                     }
+
                 }
             }
 
@@ -1067,18 +1112,22 @@ bool audioOn = false;
 
 
             window1.clear();
+
             // Draw the background
             window1.draw(backgroundSprite1);
-            window1.draw(sprite1);
-            window1.draw(sprite2);
-            window1.draw(sprite3);
-            window1.draw(sprite4);
+            //Draw the sprite
+            for (auto& sp : s) {
+                window1.draw(sp);
+            }
             // Draw the selection message
             window1.draw(selectionText);
             window1.display();
         }
 
-        return 0;
     }
+
+
+
+    return 0;
 
 }
