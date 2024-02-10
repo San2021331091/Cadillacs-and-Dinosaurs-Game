@@ -8,11 +8,11 @@
 Queue<const wchar_t *> p;
 vector<const wchar_t * > v1;
 
-player_t* Player :: player_new() {
+player_t* Player :: player_new(float speed) {
     auto* player = new player_t;
     player->base.sprite = Sprite_Handle::sprite_new(FileLoad::getImageFile1("player-jack.bmp"), 120, 110, 2.5);
     player->hit_recover_time = 0.0f;
-    player->movement_speed = 2.7;
+    player->movement_speed = speed;
     player->score = 0;
     player->base.direction = CHARACTER_DIRECTION_RIGHT;
     player->base.state = 0;
