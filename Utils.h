@@ -14,5 +14,20 @@ public:
 
 };
 
+class XorShift32 {
+private:
+    uint32_t state;
+
+public:
+    XorShift32(uint32_t seed) : state(seed) {}
+
+    float nextFloat(float min, float max);
+};
+
+
+
+
+
+
 
 #endif
