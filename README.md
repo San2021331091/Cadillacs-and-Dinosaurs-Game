@@ -95,7 +95,7 @@ ultimate aim is to deliver a high-quality and nostalgic gaming experience for pl
 
 ## Development Goal:
 The development goal for the "Cadillacs and Dinosaurs" game in C++ with SFML is
-to faithfully recreate the classic arcade experience. This involves implementing
+to faithfully recreate the classic arcade experience using data structure and algorithm. This involves implementing
 authentic gameplay mechanics, leveraging SFML for visually appealing graphics and
 animations, and introducing a robust cooperative multiplayer system. Responsive
 controls, immersive sound effects, diverse level design, and bug-free gameplay are
