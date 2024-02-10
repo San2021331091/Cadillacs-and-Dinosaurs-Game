@@ -7,7 +7,8 @@
 #include "Character.h"
 #include "FileLoad.h"
 #include "Stack.h"
-
+#include "RbTree.h"
+#include "LevelGraph.h"
 game_t* game;
 
 
@@ -147,6 +148,16 @@ void game_start_new() {
     game->state = GAME_STATE_INTRO;
 }
 
+
+
+float mi = 1.0f,mx=3.0f;
+
+
+void speedChange(float v1,float v2){
+      mi = v1;
+      mx = v2;
+}
+
 bool game_init() {
     game = new game_t;
     memset(game->keyboard_state, 0, sizeof(game->keyboard_state));
@@ -177,7 +188,11 @@ bool game_init() {
 
     game->state = GAME_STATE_MENU;
 
-    game->player = Player::player_new();
+ uint32_t seed = 123456789;
+    XorShift32 rng(seed);
+  
+
+    game->player = Player::player_new(rng.nextFloat(mi,mx));
 
     game->enemy_max = 100;
     game->enemies = new enemy_t[game->enemy_max];
@@ -359,11 +374,41 @@ void game_draw(HDC hdc, RECT* rect) {
     SelectObject(hdc, game->font);
     SetTextColor(hdc, RGB(255, 255, 0));
 
+
+
+
+   red_black_tree  rbTree;
+
+ // Insert nodes
+    rbTree.insert(0,L"Press Enter to Start Now");
+    rbTree.insert( 1,L"Press Enter to Resume");
+    rbTree.insert( 2,L"PAUSED");
+    rbTree.insert(  3,L"YOU WIN!!!");
+    rbTree.insert(  4,L"YOU DIED");
+    rbTree.insert( 5 ,L"READY?");
+    rbTree.insert(  6,L"STEADY??");
+    rbTree.insert(  7,L"GO FIGHT!!");
+
+    // Keys to search
+    vector<int> keysToSearch;
+    for (int i = 0; i < 8; i++) {
+        keysToSearch.emplace_back(i);
+    }
+
+
+vector<const wchar_t*> gameState;
+
+
+for(const auto i : keysToSearch){
+    const wchar_t * j = rbTree.search(i);
+ gameState.emplace_back(j);
+}
+
     if (state == GAME_STATE_MENU) {
         // draw the moving background
         game_draw_level(hdc, rect);
         if (game->time_text_blink < 50 ) {
-            swprintf(buf, 256, L"Press Enter to Start");
+            swprintf(buf, 256,gameState[0]);
             DrawTextW(hdc, buf, (int)wcslen(buf), &rcText, DT_CENTER | DT_VCENTER | DT_SINGLELINE);
         }
     } else if (state == GAME_STATE_PLAYING ||
@@ -433,7 +478,7 @@ void game_draw(HDC hdc, RECT* rect) {
 
         if(state == GAME_STATE_PAUSED) {
             if (game->time_text_blink < 50 ) {
-                swprintf(buf, 256, L"Press Enter to Resume");
+                swprintf(buf, 256, gameState[1]);
                 DrawTextW(hdc, buf, wcslen(buf), &rcText, DT_CENTER | DT_VCENTER | DT_SINGLELINE);
             }
 
@@ -441,27 +486,27 @@ void game_draw(HDC hdc, RECT* rect) {
             rcText.bottom -= 50;
 
             SelectObject(hdc, game->font_big);
-            swprintf(buf, 256, L"PAUSED");
+            swprintf(buf, 256, gameState[2]);
             DrawTextW(hdc, buf, wcslen(buf), &rcText, DT_CENTER | DT_VCENTER | DT_SINGLELINE);
         } else if(state == GAME_STATE_WIN) {
             if (game->time_text_blink < 50 ) {
-                swprintf(buf, 256, L"YOU WIN!!!");
+                swprintf(buf, 256, gameState[3]);
                 DrawTextW(hdc, buf, wcslen(buf), &rcText, DT_CENTER | DT_VCENTER | DT_SINGLELINE);
             }
         } else if(state == GAME_STATE_OVER) {
             if (game->time_text_blink < 50 ) {
-                swprintf(buf, 256, L"YOU DIED");
+                swprintf(buf, 256, gameState[4]);
                 DrawTextW(hdc, buf, wcslen(buf), &rcText, DT_CENTER | DT_VCENTER | DT_SINGLELINE);
             }
         } else if (state == GAME_STATE_INTRO) {
             if (game->intro_time > 200) {
-                swprintf(buf, 256, L"READY?");
+                swprintf(buf, 256, gameState[5]);
                 DrawTextW(hdc, buf, wcslen(buf), &rcText, DT_CENTER | DT_VCENTER | DT_SINGLELINE);
             } else if (game->intro_time > 100) {
-                swprintf(buf, 256, L"STEADY??");
+                swprintf(buf, 256, gameState[6]);
                 DrawTextW(hdc, buf, wcslen(buf), &rcText, DT_CENTER | DT_VCENTER | DT_SINGLELINE);
             } else {
-                swprintf(buf, 256, L"GO FIGHT!!!");
+                swprintf(buf, 256, gameState[7]);
                 if (game->time_text_blink < 50 ) {
                     DrawTextW(hdc, buf, wcslen(buf), &rcText, DT_CENTER | DT_VCENTER | DT_SINGLELINE);
                 }
@@ -825,7 +870,9 @@ LRESULT CALLBACK main_window_proc(HWND hwnd, UINT message, WPARAM wParam, LPARAM
 
 
 void game_run() {
+
     MSG msg;
+   
     LARGE_INTEGER start_counter, end_counter, frequency;
     double seconds_per_frame;
     QueryPerformanceCounter(&start_counter);
@@ -892,7 +939,8 @@ int main() {
     if (!font.loadFromFile(FileLoad::getFontFile("RobotoCondensed-Italic.ttf"))) {
         return 1;
     }
-bool audioOn = false;
+
+bool audioOn = false; 
     Text newGameButton("New Game", font, 30),audioButton("Audio:OFF",font,30);
     newGameButton.setPosition(700, 300);
     newGameButton.setFillColor(Color::White);
@@ -962,7 +1010,128 @@ bool audioOn = false;
     }
 
     if (winClose) {
-        // Create the second window
+
+
+RenderWindow wind(VideoMode(1600, 860), "Level Selection", Style::Close | Style::Titlebar);
+wind.setIcon(icon.getSize().x, icon.getSize().y, icon.getPixelsPtr());
+// Background
+Texture backgroundTexture;
+if (!backgroundTexture.loadFromFile(FileLoad::getImageFile("bg2.png"))) {
+    cerr << "Failed to load background image" << endl;
+    return EXIT_FAILURE;
+}
+
+Sprite background(backgroundTexture);
+background.setScale(wind.getSize().x / background.getLocalBounds().width,
+                    wind.getSize().y / background.getLocalBounds().height);
+
+// Buttons
+RectangleShape buttonShape(Vector2f(200, 100));
+buttonShape.setFillColor(Color::Magenta);
+buttonShape.setPosition(wind.getSize().x / 2 - 100, wind.getSize().y / 2 - 50);
+LevelGraph levelGraph;
+
+levelGraph.addLevel("Level 1");
+levelGraph.addLevel("Level 2");
+levelGraph.addLevel("Level 3");
+
+// Add connections between levels
+levelGraph.addConnection("Level 1", "Level 2");
+levelGraph.addConnection("Level 2", "Level 3");
+vector<string> visitedLevels = levelGraph.traverseSequentially("Level 1");
+
+Text buttonText;
+buttonText.setFont(font);
+buttonText.setString(visitedLevels[0]);
+buttonText.setCharacterSize(20);
+buttonText.setFillColor(Color::White);
+FloatRect textBounds = buttonText.getLocalBounds();
+buttonText.setOrigin(textBounds.left + textBounds.width / 2.0f,
+                    textBounds.top + textBounds.height / 2.0f);
+buttonText.setPosition(Vector2f(wind.getSize().x / 2, wind.getSize().y / 2 - 25));
+
+RectangleShape buttonShape2(Vector2f(200, 100));
+buttonShape2.setFillColor(Color::Red);
+buttonShape2.setPosition(wind.getSize().x / 2 - 100, wind.getSize().y / 2 + 75);
+
+Text buttonText2;
+buttonText2.setFont(font);
+buttonText2.setString(visitedLevels[1]);
+buttonText2.setCharacterSize(20);
+buttonText2.setFillColor(Color::White);
+FloatRect textBounds2 = buttonText2.getLocalBounds();
+buttonText2.setOrigin(textBounds2.left + textBounds2.width / 2.0f,
+                     textBounds2.top + textBounds2.height / 2.0f);
+buttonText2.setPosition(Vector2f(wind.getSize().x / 2, wind.getSize().y / 2 + 100));
+
+RectangleShape buttonShape3(Vector2f(200, 100));
+buttonShape3.setFillColor(Color::Blue);
+buttonShape3.setPosition(wind.getSize().x / 2 - 100, wind.getSize().y / 2 + 200);
+
+Text buttonText3;
+buttonText3.setFont(font);
+buttonText3.setString(visitedLevels[2]);
+buttonText3.setCharacterSize(20);
+buttonText3.setFillColor(Color::White);
+FloatRect textBounds3 = buttonText3.getLocalBounds();
+buttonText3.setOrigin(textBounds3.left + textBounds3.width / 2.0f,
+                     textBounds3.top + textBounds3.height / 2.0f);
+buttonText3.setPosition(Vector2f(wind.getSize().x / 2, wind.getSize().y / 2 + 225));
+
+bool winClose1 = true;
+
+while (wind.isOpen()) {
+    Event event{};
+    while (wind.pollEvent(event)) {
+        switch (event.type) {
+            case Event::Closed:
+                wind.close();
+                winClose1 = false;
+                break;
+            case Event::MouseButtonPressed:
+                if (event.mouseButton.button == Mouse::Left) {
+                    Vector2f mousePos = wind.mapPixelToCoords(Mouse::getPosition(wind));
+                    if (buttonShape.getGlobalBounds().contains(mousePos)) {
+                        wind.close();
+                         speedChange(2.7,2.8);
+                        
+                
+                    } else if (buttonShape2.getGlobalBounds().contains(mousePos)) {
+                        wind.close();
+                        speedChange(2.6,2.7);
+                  
+                    } else if (buttonShape3.getGlobalBounds().contains(mousePos)) {
+                        wind.close();
+                        speedChange(2.5,2.6);
+                       
+                     
+                    }
+                }
+                break;
+            default:
+                break;
+        }
+    }
+
+    wind.clear();
+
+    // Draw background
+    wind.draw(background);
+
+    // Draw buttons
+    wind.draw(buttonShape);
+    wind.draw(buttonText);
+    wind.draw(buttonShape2);
+    wind.draw(buttonText2);
+    wind.draw(buttonShape3);
+    wind.draw(buttonText3);
+
+    wind.display();
+}
+
+
+// Create the third window
+if(winClose1){
         RenderWindow window1(VideoMode(1600, 860), "Player Selection", Style::Close |Style::Titlebar);
         window1.setIcon(icon.getSize().x, icon.getSize().y, icon.getPixelsPtr());
         // Load the background image for the second window
@@ -997,7 +1166,7 @@ bool audioOn = false;
                 ts.emplace_back(texture);
 
             } else {
-                cerr << "Failed to load texture from file: " << fullFilePath << std::endl;
+                cerr << "Failed to load texture from file: " << fullFilePath << endl;
             }
 
                  filePaths.pop();
@@ -1069,13 +1238,11 @@ bool audioOn = false;
                     if (isGKeyPressed && event.key.code == Keyboard::U) {
                         window1.close();
                         music.stop();
-
-                        if (game_init()) {
+                             if (game_init()) {
 
                              game_run();
                              game_delete();
-                        }
-
+                             }
 
 
                     }
@@ -1126,7 +1293,7 @@ bool audioOn = false;
 
     }
 
-
+    }
 
     return 0;
 
