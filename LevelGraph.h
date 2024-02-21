@@ -2,6 +2,7 @@
 #define CADILLACS_AND_DINOSAURS_GAME_LEVELGRAPH_H
 
 #include "Game.h"
+#include "HashTable.h"
 
 class Level {
     public:
@@ -11,7 +12,7 @@ class Level {
 
 class LevelGraph {
 private:
-    unordered_map<string, vector<string>> adjacencyList;
+    HashTable<string, vector<string>> adjacencyList;
 
 public:
     void addLevel(const string& levelName);
