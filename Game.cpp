@@ -9,6 +9,8 @@
 #include "Stack.h"
 #include "RbTree.h"
 #include "LevelGraph.h"
+#include "Fenwick.h"
+
 game_t* game;
 
 
@@ -188,7 +190,16 @@ bool game_init() {
 
     game->state = GAME_STATE_MENU;
 
- uint32_t seed = 123456789;
+     FenwickTree fenwick(100, mi, mx); // Choose an appropriate size for the Fenwick tree
+    vector<float> arr = {1.2f, 1.5f, 1.6,1.8f,1.9, 2.1f,2.2f,2.4f,2.7f,3.0f,3.1f,3.4f}; // Sample data
+    for (float val : arr) {
+        fenwick.addIndex(val); // Add all indices to the map
+    }
+    for (float val : arr) {
+        fenwick.update(val, val); // Update values at indices
+    }
+
+    uint32_t seed = 123456789;
     XorShift32 rng(seed);
   
 
