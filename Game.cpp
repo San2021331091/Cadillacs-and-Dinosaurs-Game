@@ -10,6 +10,7 @@
 #include "RbTree.h"
 #include "LevelGraph.h"
 #include "Fenwick.h"
+#include "PriorityQueue.h"
 
 game_t* game;
 
@@ -34,8 +35,8 @@ void game_init_dblBuffer() {
 }
 
 bool game_init_window() {
-    game->height = 900;
-    game->width = 1600;
+    game->height = 960;
+    game->width = 1700;
     game->top_margin = 30;
     game->dbl_buffer = nullptr;
 
@@ -97,7 +98,7 @@ HGDIOBJ game_load_image(const wchar_t* path) {
 }
 
 
-void game_load_resources() {
+void game_load_resources(const string &pname) {
 
 
     game->bmp_bg = game_load_image(FileLoad::getImageFile1("ep-5.bmp"));
@@ -113,7 +114,8 @@ void game_load_resources() {
     game->level_fire->frames_per_row = 4;
     Animation_Handle::sprite_add_animation(game->level_fire, L"fire", 0, 3, 0);
     Animation_Handle::sprite_set_animation(game->level_fire, L"fire");
-
+    
+    if(pname == "Jack")
     game->bmp_avatar_player = game_load_image(FileLoad::getImageFile1("jack.bmp"));
 
     game->font = Utils::create_font(L"Arial", 20);
@@ -160,7 +162,7 @@ void speedChange(float v1,float v2){
       mx = v2;
 }
 
-bool game_init() {
+bool game_init(const string &plName) {
     game = new game_t;
     memset(game->keyboard_state, 0, sizeof(game->keyboard_state));
 
@@ -168,7 +170,7 @@ bool game_init() {
         return false;
     }
 
-    game_load_resources();
+    game_load_resources(plName);
 
     game->draw_max = 100;
     game->draw_list = new draw_t[game->draw_max];
@@ -203,7 +205,7 @@ bool game_init() {
     XorShift32 rng(seed);
   
 
-    game->player = Player::player_new(rng.nextFloat(mi,mx));
+    game->player = Player::player_new(rng.nextFloat(mi,mx),plName);
 
     game->enemy_max = 100;
     game->enemies = new enemy_t[game->enemy_max];
@@ -297,11 +299,11 @@ void game_draw_player_statistics(HDC hdc, int x) {
 
     game_draw_avatar(hdc, x, 5);
 
-    SetTextColor(hdc, RGB(255, 255, 255));
+    SetTextColor(hdc, RGB(0, 255,255));
     swprintf(str_score, 256, L"Jack");
     TextOutW(hdc, x + 60, 20, str_score, wcslen(str_score));
 
-    SetTextColor(hdc, RGB(255, 255, 0));
+    SetTextColor(hdc, RGB(0, 255, 0));
     swprintf(str_score, 256, L"%05d", game->player->score);
     TextOutW(hdc, x + 200, 20, str_score, wcslen(str_score));
 
@@ -928,7 +930,7 @@ int main() {
 
 
     // Create the first window
-    RenderWindow window(VideoMode(1600, 800), "Cadillacs and Dinosaurs Game",Style::Close|Style::Titlebar);
+    RenderWindow window(VideoMode(1700, 860), "Cadillacs and Dinosaurs Game",Style::Close|Style::Titlebar);
 
 
     Image icon;
@@ -1023,7 +1025,7 @@ bool audioOn = false;
     if (winClose) {
 
 
-RenderWindow wind(VideoMode(1600, 860), "Level Selection", Style::Close | Style::Titlebar);
+RenderWindow wind(VideoMode(1700, 860), "Level Selection", Style::Close | Style::Titlebar);
 wind.setIcon(icon.getSize().x, icon.getSize().y, icon.getPixelsPtr());
 // Background
 Texture backgroundTexture;
@@ -1143,7 +1145,7 @@ while (wind.isOpen()) {
 
 // Create the third window
 if(winClose1){
-        RenderWindow window1(VideoMode(1600, 860), "Player Selection", Style::Close |Style::Titlebar);
+        RenderWindow window1(VideoMode(1700, 860), "Player Selection", Style::Close |Style::Titlebar);
         window1.setIcon(icon.getSize().x, icon.getSize().y, icon.getPixelsPtr());
         // Load the background image for the second window
         Image image;
@@ -1221,13 +1223,19 @@ if(winClose1){
 
         // Set the position of the text
         selectionText.setPosition(centerX, centerY);
-        String s1 = "Player Jack is selected";
+        string s1 = "Player Jack is selected";
         bool isGKeyPressed = false;
         SoundBuffer buffer;
         buffer.loadFromFile(FileLoad::getAudioFile("start.wav"));
         Sound sound;
         sound.setBuffer(buffer);
 
+       PriorityQueue pq;
+       pq.insert("Jack", 4);
+       pq.insert("Hannah", 3);
+       pq.insert("Mess", 1);
+       pq.insert("Mustafa", 2);
+   
 
         while (window1.isOpen()) {
             while (window1.pollEvent(event)) {
@@ -1249,7 +1257,7 @@ if(winClose1){
                     if (isGKeyPressed && event.key.code == Keyboard::U) {
                         window1.close();
                         music.stop();
-                             if (game_init()) {
+                             if (game_init(pq.extractMax())) {
 
                              game_run();
                              game_delete();
