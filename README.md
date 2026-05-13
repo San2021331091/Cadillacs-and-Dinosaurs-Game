@@ -1,5 +1,7 @@
 
-![Cadillacs and Dinosaurs Game](https://play-lh.googleusercontent.com/aM5Pc5NSN9A3y-2QhHk7L2qMeiHGDzXa57CewUXJbolc-DHa6hJBYr0ANEdGmAsxqCQ)
+<div style="display:flex;justify-content:center;align-items:center;">
+  <img src="https://play-lh.googleusercontent.com/aM5Pc5NSN9A3y-2QhHk7L2qMeiHGDzXa57CewUXJbolc-DHa6hJBYr0ANEdGmAsxqCQ"/>
+</div>
 
 
 
@@ -103,7 +105,6 @@ key priorities. The project also emphasises an intuitive user interface, technic
 optimization for scalability, and thorough documentation to support developers. The
 ultimate aim is to deliver a high-quality and nostalgic gaming experience for players.
 
-[Download app](https://drive.google.com/file/d/1fBTut0dccysZ-ANj2YFNcfjqRLOfCFEJ/view?usp=sharing)
 
 ---------------------------------------------------------------------------------------------
 SUBMITTED BY:
